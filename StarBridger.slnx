@@ -1,4 +1,26 @@
+
 <Solution>
-  <Project Path="StarBridger.Core/StarBridger.Core.csproj" />
-  <Project Path="StarBridger.Core/StarBridger.UI.csproj" />
+  <Folder Name="/Core/">
+    <Project Path="StarBridger.Contracts/StarBridger.Contracts.csproj" />
+    <Project Path="StarBridger.Core/StarBridger.Core.csproj" />
+  </Folder>
+
+  <Folder Name="/Infrastructure/">
+    <Project Path="StarBridger.IPC/StarBridger.IPC.csproj" />
+    <Project Path="StarBridger.Telemetry/StarBridger.Telemetry.csproj" />
+    <Project Path="StarBridger.Web/StarBridger.WEB.csproj" DisplayName="StarBridger.Web" />
+  </Folder>
+
+  <Folder Name="/Applications/">
+    <Project Path="StarBridger.Host/StarBridger.Host.csproj" Id="8ccc5d05-5180-4a01-87d7-77d97a33ff05" />
+    <Project Path="StarBridger.UI/StarBridger.UI.csproj" />
+  </Folder>
+
+  <Folder Name="/SDK/">
+    <Project Path="StarBridger.SDK/StarBridger.SDK.csproj" />
+  </Folder>
+
+  <Folder Name="/Tests/">
+    <Project Path="StarBridger.Tests/StarBridger.Tests.csproj" />
+  </Folder>
 </Solution>

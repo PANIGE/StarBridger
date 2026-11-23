@@ -1,0 +1,194 @@
+Structure du dossier
+Le numéro de série du volume est DAD8-8DCB
+C:\USERS\NICOL\SOURCE\REPOS\STARBRIDGER
+¦   .gitignore
+¦   README.md
+¦   StarBridger.slnx
+¦   tree.txt
+¦   
++---StarBridger.Contracts
+¦   ¦   Class1.cs
+¦   ¦   StarBridger.Contracts.csproj
+¦   ¦   
+¦   +---obj
+¦           project.assets.json
+¦           project.nuget.cache
+¦           StarBridger.Contracts.csproj.nuget.dgspec.json
+¦           StarBridger.Contracts.csproj.nuget.g.props
+¦           StarBridger.Contracts.csproj.nuget.g.targets
+¦           
++---StarBridger.Core
+¦   ¦   App.config
+¦   ¦   StarBridger.Core.csproj
+¦   ¦   
+¦   +---bin
+¦   ¦   +---Debug
+¦   ¦   ¦   +---net11.0
+¦   ¦   +---Release
+¦   +---obj
+¦       ¦   project.assets.json
+¦       ¦   project.nuget.cache
+¦       ¦   StarBridger.Core.csproj.nuget.dgspec.json
+¦       ¦   StarBridger.Core.csproj.nuget.g.props
+¦       ¦   StarBridger.Core.csproj.nuget.g.targets
+¦       ¦   
+¦       +---Debug
+¦           ¦   DesignTimeResolveAssemblyReferencesInput.cache
+¦           ¦   StarBridger.Core.csproj.AssemblyReference.cache
+¦           ¦   
+¦           +---net11.0
+¦           ¦   ¦   .NETCoreApp,Version=v11.0.AssemblyAttributes.cs
+¦           ¦   ¦   StarBridger.Core.AssemblyInfo.cs
+¦           ¦   ¦   StarBridger.Core.AssemblyInfoInputs.cache
+¦           ¦   ¦   StarBridger.Core.assets.cache
+¦           ¦   ¦   StarBridger.Core.GeneratedMSBuildEditorConfig.editorconfig
+¦           ¦   ¦   StarBridger.Core.GlobalUsings.g.cs
+¦           ¦   ¦   
+¦           ¦   +---ref
+¦           ¦   +---refint
+¦           +---TempPE
++---StarBridger.Host
+¦   ¦   Program.cs
+¦   ¦   StarBridger.Host.csproj
+¦   ¦   
+¦   +---bin
+¦   ¦   +---Debug
+¦   ¦       +---net11.0
+¦   +---obj
+¦       ¦   project.assets.json
+¦       ¦   project.nuget.cache
+¦       ¦   StarBridger.Host.csproj.nuget.dgspec.json
+¦       ¦   StarBridger.Host.csproj.nuget.g.props
+¦       ¦   StarBridger.Host.csproj.nuget.g.targets
+¦       ¦   
+¦       +---Debug
+¦           +---net11.0
+¦               ¦   .NETCoreApp,Version=v11.0.AssemblyAttributes.cs
+¦               ¦   StarBridger.Host.AssemblyInfo.cs
+¦               ¦   StarBridger.Host.AssemblyInfoInputs.cache
+¦               ¦   StarBridger.Host.assets.cache
+¦               ¦   StarBridger.Host.GeneratedMSBuildEditorConfig.editorconfig
+¦               ¦   StarBridger.Host.GlobalUsings.g.cs
+¦               ¦   
+¦               +---ref
+¦               +---refint
++---StarBridger.IPC
+¦   ¦   Class1.cs
+¦   ¦   StarBridger.IPC.csproj
+¦   ¦   
+¦   +---obj
+¦           project.assets.json
+¦           project.nuget.cache
+¦           StarBridger.IPC.csproj.nuget.dgspec.json
+¦           StarBridger.IPC.csproj.nuget.g.props
+¦           StarBridger.IPC.csproj.nuget.g.targets
+¦           
++---StarBridger.SDK
+¦   ¦   Class1.cs
+¦   ¦   StarBridger.SDK.csproj
+¦   ¦   
+¦   +---obj
+¦           project.assets.json
+¦           project.nuget.cache
+¦           StarBridger.SDK.csproj.nuget.dgspec.json
+¦           StarBridger.SDK.csproj.nuget.g.props
+¦           StarBridger.SDK.csproj.nuget.g.targets
+¦           
++---StarBridger.Telemetry
+¦   ¦   Class1.cs
+¦   ¦   StarBridger.Telemetry.csproj
+¦   ¦   
+¦   +---obj
+¦           project.assets.json
+¦           project.nuget.cache
+¦           StarBridger.Telemetry.csproj.nuget.dgspec.json
+¦           StarBridger.Telemetry.csproj.nuget.g.props
+¦           StarBridger.Telemetry.csproj.nuget.g.targets
+¦           
++---StarBridger.Tests
+¦   ¦   Class1.cs
+¦   ¦   StarBridger.Tests.csproj
+¦   ¦   
+¦   +---obj
+¦           project.assets.json
+¦           project.nuget.cache
+¦           StarBridger.Tests.csproj.nuget.dgspec.json
+¦           StarBridger.Tests.csproj.nuget.g.props
+¦           StarBridger.Tests.csproj.nuget.g.targets
+¦           
++---StarBridger.UI
+¦   ¦   Info.plist
+¦   ¦   MacIcon.icns
+¦   ¦   MainForm.cs
+¦   ¦   Program.cs
+¦   ¦   StarBridger.UI.csproj
+¦   ¦   
+¦   +---bin
+¦   ¦   +---Wpf
+¦   ¦       +---Debug
+¦   ¦           +---net10.0-windows
+¦   ¦           +---net11.0-windows7.0
+¦   ¦                   Eto.dll
+¦   ¦                   Eto.Wpf.dll
+¦   ¦                   Microsoft.WindowsAPICodePack.dll
+¦   ¦                   Microsoft.WindowsAPICodePack.Shell.dll
+¦   ¦                   StarBridger.UI.deps.json
+¦   ¦                   StarBridger.UI.dll
+¦   ¦                   StarBridger.UI.exe
+¦   ¦                   StarBridger.UI.pdb
+¦   ¦                   StarBridger.UI.runtimeconfig.dev.json
+¦   ¦                   StarBridger.UI.runtimeconfig.json
+¦   ¦                   
+¦   +---obj
+¦       ¦   project.assets.json
+¦       ¦   project.nuget.cache
+¦       ¦   StarBridger.UI.csproj.nuget.dgspec.json
+¦       ¦   StarBridger.UI.csproj.nuget.g.props
+¦       ¦   StarBridger.UI.csproj.nuget.g.targets
+¦       ¦   
+¦       +---Wpf
+¦           +---Debug
+¦               +---net10.0-windows
+¦               ¦   ¦   .NETCoreApp,Version=v10.0.AssemblyAttributes.cs
+¦               ¦   ¦   StarBridger.UI.AssemblyInfo.cs
+¦               ¦   ¦   StarBridger.UI.AssemblyInfoInputs.cache
+¦               ¦   ¦   StarBridger.UI.assets.cache
+¦               ¦   ¦   StarBridger.UI.csproj.AssemblyReference.cache
+¦               ¦   ¦   StarBridger.UI.GeneratedMSBuildEditorConfig.editorconfig
+¦               ¦   ¦   
+¦               ¦   +---ref
+¦               ¦   +---refint
+¦               +---net11.0-windows7.0
+¦                   ¦   .NETCoreApp,Version=v11.0.AssemblyAttributes.cs
+¦                   ¦   apphost.exe
+¦                   ¦   StarBrid.CCC28C6E.Up2Date
+¦                   ¦   StarBridger.UI.AssemblyInfo.cs
+¦                   ¦   StarBridger.UI.AssemblyInfoInputs.cache
+¦                   ¦   StarBridger.UI.assets.cache
+¦                   ¦   StarBridger.UI.csproj.AssemblyReference.cache
+¦                   ¦   StarBridger.UI.csproj.BuildWithSkipAnalyzers
+¦                   ¦   StarBridger.UI.csproj.CoreCompileInputs.cache
+¦                   ¦   StarBridger.UI.csproj.FileListAbsolute.txt
+¦                   ¦   StarBridger.UI.dll
+¦                   ¦   StarBridger.UI.GeneratedMSBuildEditorConfig.editorconfig
+¦                   ¦   StarBridger.UI.genruntimeconfig.cache
+¦                   ¦   StarBridger.UI.pdb
+¦                   ¦   StarBridger.UI.sourcelink.json
+¦                   ¦   
+¦                   +---ref
+¦                   ¦       StarBridger.UI.dll
+¦                   ¦       
+¦                   +---refint
+¦                           StarBridger.UI.dll
+¦                           
++---StarBridger.WEB
+    ¦   Class1.cs
+    ¦   StarBridger.WEB.csproj
+    ¦   
+    +---obj
+            project.assets.json
+            project.nuget.cache
+            StarBridger.WEB.csproj.nuget.dgspec.json
+            StarBridger.WEB.csproj.nuget.g.props
+            StarBridger.WEB.csproj.nuget.g.targets
+            

@@ -1,19 +1,18 @@
-﻿using System;
+﻿using Eto.Drawing;
 using Eto.Forms;
-using Eto.Drawing;
+using System;
 
-namespace StarBridger.UI
+namespace StarBridger.UI;
+
+class Program
 {
-	class Program
-	{
-		[STAThread]
-		static void Main(string[] args)
-		{
-			var app = new Application(Eto.Platform.Detect);
-			// Wpf doesn't follow the system light/dark theme unless asked to
-			if (app.Platform.IsWpf)
-				app.Theme = Themes.System;
-			app.Run(new MainForm());
-		}
-	}
+  [STAThread]
+  static void Main(string[] args)
+  {
+    var app = new Application(Eto.Platform.Detect);
+    // Wpf doesn't follow the system light/dark theme unless asked to
+    if (app.Platform.IsWpf)
+      app.Theme = Themes.System;
+    app.Run(new MainForm());
+  }
 }
