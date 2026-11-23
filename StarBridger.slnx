@@ -1,0 +1,4 @@
+<Solution>
+  <Project Path="StarBridger.Core/StarBridger.Core.csproj" />
+  <Project Path="StarBridger.Core/StarBridger.UI.csproj" />
+</Solution>
