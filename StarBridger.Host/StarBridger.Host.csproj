@@ -13,4 +13,10 @@
     <PackageReference Include="Serilog.Sinks.File" Version="7.0.0" />
   </ItemGroup>
 
+  <ItemGroup>
+    <ProjectReference Include="..\StarBridger.Core\StarBridger.Core.csproj" />
+    <ProjectReference Include="..\StarBridger.IPC\StarBridger.IPC.csproj" />
+    <ProjectReference Include="..\StarBridger.Telemetry\StarBridger.Telemetry.csproj" />
+  </ItemGroup>
+
 </Project>

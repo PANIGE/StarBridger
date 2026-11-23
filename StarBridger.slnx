@@ -18,6 +18,12 @@
 
   <Folder Name="/SDK/">
     <Project Path="StarBridger.SDK/StarBridger.SDK.csproj" />
+    <Project Path="StarBridger.Shell/StarBridger.Shell.csproj" Id="2dd528f1-97f8-4de7-945b-1394f41f9c1e" />
+  </Folder>
+  <Folder Name="/Solution Files/">
+    <File Path=".editorconfig" />
+    <File Path=".gitignore" />
+    <File Path="README.md" />
   </Folder>
 
   <Folder Name="/Tests/">

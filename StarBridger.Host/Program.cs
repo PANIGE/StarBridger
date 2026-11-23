@@ -3,7 +3,10 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
 using Serilog;
+using StarBridger.Core.Services;
+using StarBridger.Host;
 using StarBridger.Host.Utils;
+using StarBridger.IPC.Services;
 
 internal class Program
 {
@@ -20,6 +23,8 @@ internal class Program
       ConfigureServices(builder.Services);
 
       using IHost host = builder.Build();
+
+      RegisterShellCommands(host);
 
       Microsoft.Extensions.Logging.ILogger logger = host.Services
           .GetRequiredService<ILoggerFactory>()
@@ -39,9 +44,17 @@ internal class Program
     }
   }
 
+  private static void RegisterShellCommands(IHost host)
+  {
+    IHostApplicationLifetime lifetime = host.Services.GetRequiredService<IHostApplicationLifetime>();
+    StarBridgerShell shell = host.Services.GetRequiredService<StarBridgerShell>();
+    ShellReceiver.SetupShell(lifetime, shell);
+  }
+
   private static void ConfigureServices(IServiceCollection services)
   {
-    // main executions services go there
-    services.GetHashCode(); // to avoid IDE0060 TODO: remove this line when adding services
+    services.AddSingletonHostedService<StarBridgerShell>();
+    services.AddSingletonHostedService<MainIpcBusService>();
+    services.AddSingletonHostedService<ShellIpcService>();
   }
 }
