@@ -182,28 +182,39 @@ public sealed class StarCitizenTelemetryService : BackgroundService
 
       Game.TelemetryStreamResponse frame = call.ResponseStream.Current;
 
-      if (frame.Vehicle?.State is Game.VehicleState vehicle)
-      {
-        Vehicle.Publish(StarCitizenTelemetryMapper.MapVehicle(vehicle));
-      }
-
-      if (frame.Actor is Game.ActorFrame actor)
-      {
-        Actor.Publish(StarCitizenTelemetryMapper.MapActor(actor));
-      }
-
-      if (frame.Weapons is Game.WeaponsFrame weapons)
-      {
-        Weapons.Publish(StarCitizenTelemetryMapper.MapWeapons(weapons));
-      }
+      Game.VehicleFrame? previousVehicle;
+      Game.ActorFrame? previousActor;
+      Game.WeaponsFrame? previousWeapons;
 
       lock (_extractLock)
       {
+        previousVehicle = _lastVehicleFrame;
+        previousActor = _lastActorFrame;
+        previousWeapons = _lastWeaponsFrame;
+
         _lastVehicleFrame = frame.Vehicle?.Clone();
         _lastActorFrame = frame.Actor?.Clone();
         _lastWeaponsFrame = frame.Weapons?.Clone();
 
         _lastTelemetryAtUtc = DateTimeOffset.UtcNow;
+      }
+
+      if (frame.Vehicle?.State is Game.VehicleState vehicle &&
+          TelemetryComparer.HasChanged(previousVehicle, frame.Vehicle))
+      {
+        Vehicle.Publish(StarCitizenTelemetryMapper.MapVehicle(vehicle));
+      }
+
+      if (frame.Actor is Game.ActorFrame actor &&
+          TelemetryComparer.HasChanged(previousActor, actor))
+      {
+        Actor.Publish(StarCitizenTelemetryMapper.MapActor(actor));
+      }
+
+      if (frame.Weapons is Game.WeaponsFrame weapons &&
+          TelemetryComparer.HasChanged(previousWeapons, weapons))
+      {
+        Weapons.Publish(StarCitizenTelemetryMapper.MapWeapons(weapons));
       }
 
       DateTimeOffset now = DateTimeOffset.UtcNow;
