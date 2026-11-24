@@ -27,6 +27,7 @@ public class MainIpcBusService : BackgroundService
   {
     _logger = logger;
     _shell = shell;
+    RegisterShellCommands();
   }
 
   private readonly object _broadcastLock = new();

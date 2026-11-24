@@ -34,6 +34,8 @@ internal class Program
 
       logger.LogInformation("StarBridger starting");
 
+      ConfigureIpcConnections(host);
+
       await host.RunAsync();
     }
     catch (Exception ex)

@@ -199,20 +199,9 @@ public sealed class StarCitizenTelemetryService : BackgroundService
 
       lock (_extractLock)
       {
-        if (frame.Vehicle?.State is not null)
-        {
-          _lastVehicleFrame = frame.Vehicle.Clone();
-        }
-
-        if (frame.Actor is not null)
-        {
-          _lastActorFrame = frame.Actor.Clone();
-        }
-
-        if (frame.Weapons is not null)
-        {
-          _lastWeaponsFrame = frame.Weapons.Clone();
-        }
+        _lastVehicleFrame = frame.Vehicle?.Clone();
+        _lastActorFrame = frame.Actor?.Clone();
+        _lastWeaponsFrame = frame.Weapons?.Clone();
 
         _lastTelemetryAtUtc = DateTimeOffset.UtcNow;
       }
