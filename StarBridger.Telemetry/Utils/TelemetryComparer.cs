@@ -30,8 +30,8 @@ internal static class TelemetryComparer
       return previous != current;
     }
 
-    Game.VehicleFrame a = previous.Clone();
-    Game.VehicleFrame b = current.Clone();
+    Game.VehicleFrame a = previous;
+    Game.VehicleFrame b = current;
 
     NormalizeVehicle(a);
     NormalizeVehicle(b);
@@ -44,10 +44,14 @@ internal static class TelemetryComparer
     Game.VehicleFlightInstruments? instruments =
       frame.State?.Flight?.Instruments;
 
-    if (instruments is not null &&
-        MathF.Abs(instruments.Speed) < SPEED_EPSILON)
+    if (instruments is not null && MathF.Abs(instruments.Speed) < SPEED_EPSILON)
     {
       instruments.Speed = 0f;
+    }
+
+    if (instruments is not null && MathF.Abs(instruments.VerticalSpeedIndicator) < SPEED_EPSILON)
+    {
+      instruments.VerticalSpeedIndicator = 0f;
     }
   }
 }

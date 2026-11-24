@@ -1,132 +1,416 @@
-﻿
-using Microsoft.VisualBasic;
-using Newtonsoft.Json;
+﻿using Newtonsoft.Json;
+using Newtonsoft.Json.Linq;
 using StarBridger.Contracts.Core.Shell;
-using StarBridger.Contracts.IPC;
 using StarBridger.Contracts.IPC.Shell;
-using System;
-using System.IO;
-using System.IO.Pipes;
+using StarBridger.SDK;
+using StarBridger.SDK.Controllers;
+using StarBridger.SDK.Controllers.Shell;
 using System.Text;
-using System.Text.Json.Serialization;
 
 namespace StarBridger.ConsoleClient;
 
 internal static class Program
 {
+  private enum DashboardView
+  {
+    All,
+    Actor,
+    Vehicle,
+    Weapons,
+    GameConnection
+  }
+
+  private readonly record struct DashboardRow(string Section, string Path, string Value);
+
   private static async Task Main()
   {
-    Console.WriteLine("StarBridger Shell");
-    Console.WriteLine("Type 'exit' to quit.");
+    Console.OutputEncoding = Encoding.UTF8;
+
+    await using StarBridgerClient client = new();
+    using CancellationTokenSource lifetime = new();
+
+    Task runTask = client.RunAsync(lifetime.Token);
+    bool reportedRunFailure = false;
+
+    Console.WriteLine("StarBridger Shell (SDK)");
+    Console.WriteLine("Commands: monitor (live telemetry), exit (quit), or any Host Shell command.");
     Console.WriteLine();
 
-    while (true)
+    try
     {
-      Console.Write("starbridger> ");
-
-      string? input = Console.ReadLine()?.Trim();
-
-      if (input is null ||
-          input.Equals("exit", StringComparison.OrdinalIgnoreCase))
+      while (true)
       {
-        break;
-      }
+        if (runTask.IsCompleted && !reportedRunFailure)
+        {
+          ReportMainBusCompletion(runTask);
+          reportedRunFailure = true;
+        }
 
-      if (string.IsNullOrWhiteSpace(input))
-      {
-        continue;
+        Console.Write("starbridger> ");
+        string? input = Console.ReadLine()?.Trim();
+
+        if (input is null || input.Equals("exit", StringComparison.OrdinalIgnoreCase))
+          break;
+
+        if (string.IsNullOrWhiteSpace(input))
+          continue;
+
+        try
+        {
+          if (input.Equals("monitor", StringComparison.OrdinalIgnoreCase))
+          {
+            await RunMonitorAsync(client, runTask, lifetime.Token);
+          }
+          else
+          {
+            await ExecuteCommandAsync(client, input, lifetime.Token);
+          }
+        }
+        catch (OperationCanceledException) when (lifetime.IsCancellationRequested)
+        {
+          break;
+        }
+        catch (TimeoutException)
+        {
+          Console.WriteLine("Unable to connect to StarBridger (timeout).");
+        }
+        catch (IOException ex)
+        {
+          Console.WriteLine($"I/O error: {ex.Message}");
+        }
+        catch (Exception ex)
+        {
+          Console.WriteLine($"Error: {ex.Message}");
+        }
+
+        Console.WriteLine();
       }
+    }
+    finally
+    {
+      lifetime.Cancel();
 
       try
       {
-        await ExecuteCommand(input);
+        await runTask;
       }
-      catch (TimeoutException)
+      catch (OperationCanceledException) when (lifetime.IsCancellationRequested)
       {
-        Console.WriteLine("Unable to connect to StarBridger (timeout).");
-      }
-      catch (IOException ex)
-      {
-        Console.WriteLine($"IPC error: {ex.Message}");
+        // Expected shutdown.
       }
       catch (Exception ex)
       {
-        Console.WriteLine($"Error: {ex.Message}");
+        if (!reportedRunFailure)
+          Console.WriteLine($"MainBus stopped with an error: {ex.Message}");
       }
-
-      Console.WriteLine();
     }
   }
 
-  private static async Task ExecuteCommand(string commandText)
+  private static void ReportMainBusCompletion(Task runTask)
   {
-    using NamedPipeClientStream pipe = new(
-      ".",
-      PipeNames.Shell,
-      PipeDirection.InOut,
-      PipeOptions.Asynchronous);
-
-    await pipe.ConnectAsync(3000);
-
-    using StreamReader reader = new(
-      pipe,
-      Encoding.UTF8,
-      false,
-      1024,
-      leaveOpen: true);
-
-    using StreamWriter writer = new(
-      pipe,
-      new UTF8Encoding(false),
-      1024,
-      leaveOpen: true)
+    if (runTask.IsFaulted)
     {
-      AutoFlush = true
-    };
+      Console.WriteLine($"[MainBus error] {runTask.Exception?.GetBaseException().Message}");
+    }
+    else if (runTask.IsCanceled)
+    {
+      Console.WriteLine("[MainBus canceled]");
+    }
+    else
+    {
+      Console.WriteLine("[MainBus disconnected]");
+    }
+  }
 
+  private static async Task ExecuteCommandAsync(
+    StarBridgerClient client,
+    string commandText,
+    CancellationToken cancellationToken)
+  {
     Command command = ParseCommand(commandText);
+    ShellCommandExecution execution = client.Shell.ExecuteAsync(command, cancellationToken);
 
-    await writer.WriteLineAsync(
-      JsonConvert.SerializeObject(command));
-
-    string? line;
-
-    while ((line = await reader.ReadLineAsync()) is not null)
+    await foreach (ShellResponse response in execution.Result.Responses.WithCancellation(cancellationToken))
     {
-      ShellResponse? response =
-        JsonConvert.DeserializeObject<ShellResponse>(line);
-
       switch (response)
       {
         case OutputShellResponse output:
           Console.WriteLine(output.Message);
           break;
 
-        case CompletedShellResponse completed:
-          if (completed.Success)
-          {
-            Console.WriteLine("[Completed]");
-          }
-          else
-          {
-            Console.WriteLine(
-              $"[Failed] {completed.ErrorMessage}");
-          }
+        case DataShellResponse data:
+          Console.WriteLine(data.Payload is JToken token
+            ? token.ToString(Formatting.Indented)
+            : JsonConvert.SerializeObject(data.Payload, Formatting.Indented));
+          break;
 
-          return;
+        case CompletedShellResponse completed:
+          Console.WriteLine(completed.Success
+            ? "[Completed]"
+            : $"[Failed] {completed.ErrorMessage}");
+          break;
       }
     }
 
-    Console.WriteLine("[Disconnected before completion]");
+    await execution.Completion;
   }
+
+  private static async Task RunMonitorAsync(
+    StarBridgerClient client,
+    Task runTask,
+    CancellationToken cancellationToken)
+  {
+    if (Console.IsInputRedirected || Console.IsOutputRedirected)
+    {
+      Console.WriteLine("The live monitor requires an interactive terminal.");
+      return;
+    }
+
+    DashboardView view = DashboardView.All;
+    int offset = 0;
+    List<string> previousFrame = [];
+    int previousWidth = 0;
+    int previousHeight = 0;
+
+    try
+    {
+      Console.CursorVisible = false;
+      Console.Clear();
+
+      while (!cancellationToken.IsCancellationRequested)
+      {
+        int width = Console.WindowWidth;
+        int height = Console.WindowHeight;
+        int visibleRows = Math.Max(0, height - 6);
+
+        while (Console.KeyAvailable)
+        {
+          ConsoleKeyInfo key = Console.ReadKey(intercept: true);
+
+          if (key.Key is ConsoleKey.Q or ConsoleKey.Escape)
+            return;
+
+          switch (key.Key)
+          {
+            case ConsoleKey.D0:
+            case ConsoleKey.NumPad0:
+              view = DashboardView.All;
+              offset = 0;
+              break;
+            case ConsoleKey.D1:
+            case ConsoleKey.NumPad1:
+              view = DashboardView.Actor;
+              offset = 0;
+              break;
+            case ConsoleKey.D2:
+            case ConsoleKey.NumPad2:
+              view = DashboardView.Vehicle;
+              offset = 0;
+              break;
+            case ConsoleKey.D3:
+            case ConsoleKey.NumPad3:
+              view = DashboardView.Weapons;
+              offset = 0;
+              break;
+            case ConsoleKey.D4:
+            case ConsoleKey.NumPad4:
+              view = DashboardView.GameConnection;
+              offset = 0;
+              break;
+            case ConsoleKey.UpArrow:
+              offset = Math.Max(0, offset - 1);
+              break;
+            case ConsoleKey.DownArrow:
+              offset++;
+              break;
+            case ConsoleKey.PageUp:
+              offset = Math.Max(0, offset - Math.Max(1, visibleRows));
+              break;
+            case ConsoleKey.PageDown:
+              offset += Math.Max(1, visibleRows);
+              break;
+            case ConsoleKey.Home:
+              offset = 0;
+              break;
+            case ConsoleKey.End:
+              offset = int.MaxValue;
+              break;
+          }
+        }
+
+        List<DashboardRow> rows = BuildRows(client.Context, view);
+        int maxOffset = Math.Max(0, rows.Count - visibleRows);
+        offset = Math.Clamp(offset, 0, maxOffset);
+
+        if (width != previousWidth || height != previousHeight)
+        {
+          Console.Clear();
+          previousFrame.Clear();
+          previousWidth = width;
+          previousHeight = height;
+        }
+
+        List<string> frame = BuildFrame(rows, view, offset, width, height, runTask);
+        RenderFrame(frame, previousFrame, width);
+
+        await Task.Delay(250, cancellationToken);
+      }
+    }
+    catch (OperationCanceledException) when (cancellationToken.IsCancellationRequested)
+    {
+      // Expected shutdown.
+    }
+    finally
+    {
+      Console.CursorVisible = true;
+      Console.Clear();
+    }
+  }
+
+  private static List<DashboardRow> BuildRows(TelemetryContext context, DashboardView view)
+  {
+    List<DashboardRow> rows = [];
+
+    if (view is DashboardView.All or DashboardView.Actor)
+      AddState(rows, "ACTOR", context.Actor);
+
+    if (view is DashboardView.All or DashboardView.Vehicle)
+      AddState(rows, "VEHICLE", context.Vehicle);
+
+    if (view is DashboardView.All or DashboardView.Weapons)
+      AddState(rows, "WEAPONS", context.Weapons);
+
+    if (view is DashboardView.All or DashboardView.GameConnection)
+      AddState(rows, "GAME CONNECTION", context.GameConnection);
+
+    return rows;
+  }
+
+  private static void AddState(List<DashboardRow> rows, string section, object? state)
+  {
+    if (state is null)
+    {
+      rows.Add(new DashboardRow(section, "(not received yet)", "—"));
+      return;
+    }
+
+    AddToken(rows, section, string.Empty, JToken.FromObject(state));
+  }
+
+  private static void AddToken(
+    List<DashboardRow> rows,
+    string section,
+    string path,
+    JToken token)
+  {
+    if (token is JObject obj)
+    {
+      if (!obj.HasValues)
+        rows.Add(new DashboardRow(section, path, "{}"));
+
+      foreach (JProperty property in obj.Properties())
+      {
+        string childPath = string.IsNullOrEmpty(path)
+          ? property.Name
+          : $"{path}.{property.Name}";
+
+        AddToken(rows, section, childPath, property.Value);
+      }
+    }
+    else if (token is JArray array)
+    {
+      if (array.Count == 0)
+        rows.Add(new DashboardRow(section, path, "[]"));
+
+      for (int i = 0; i < array.Count; i++)
+        AddToken(rows, section, $"{path}[{i}]", array[i]);
+    }
+    else
+    {
+      rows.Add(new DashboardRow(
+        section,
+        path,
+        token.Type == JTokenType.Null ? "null" : token.ToString(Formatting.None)));
+    }
+  }
+
+  private static List<string> BuildFrame(
+    List<DashboardRow> rows,
+    DashboardView view,
+    int offset,
+    int width,
+    int height,
+    Task runTask)
+  {
+    List<string> frame = [];
+
+    string busStatus = runTask.IsFaulted ? "FAULTED"
+      : runTask.IsCanceled ? "CANCELED"
+      : runTask.IsCompleted ? "STOPPED"
+      : "RUNNING";
+
+    frame.Add($"STARBRIDGER | LIVE GAME CONTEXT | MainBus: {busStatus}");
+    frame.Add("[0] All  [1] Actor  [2] Vehicle  [3] Weapons  [4] Connection");
+    frame.Add("[Up/Down/PgUp/PgDn/Home/End] Scroll  [Q/Esc] Exit monitor");
+    frame.Add($"View: {view} | Fields: {rows.Count} | Scroll: {offset + 1}/{Math.Max(1, rows.Count)}");
+
+    int usableWidth = Math.Max(1, width - 1);
+    int fieldWidth = Math.Clamp(usableWidth * 2 / 3, 1, Math.Max(1, usableWidth - 3));
+    int valueWidth = Math.Max(0, usableWidth - fieldWidth - 3);
+
+    frame.Add($"{Fit("SECTION / FIELD", fieldWidth)} | {Fit("VALUE", valueWidth)}");
+    frame.Add(new string('-', usableWidth));
+
+    int visibleRows = Math.Max(0, height - frame.Count);
+
+    foreach (DashboardRow row in rows.Skip(offset).Take(visibleRows))
+    {
+      string label = $"{row.Section} / {row.Path}";
+      frame.Add($"{Fit(label, fieldWidth)} | {Fit(row.Value, valueWidth)}");
+    }
+
+    return frame;
+  }
+
+  private static string Fit(string text, int width)
+  {
+    if (width <= 0)
+      return string.Empty;
+
+    if (text.Length > width)
+      return width == 1 ? "…" : text[..(width - 1)] + "…";
+
+    return text.PadRight(width);
+  }
+
+  private static void RenderFrame(List<string> frame, List<string> previousFrame, int width)
+  {
+    int usableWidth = Math.Max(1, width - 1);
+    int height = Console.WindowHeight;
+
+    for (int y = 0; y < height; y++)
+    {
+      string line = y < frame.Count ? Fit(frame[y], usableWidth) : new string(' ', usableWidth);
+
+      if (y < previousFrame.Count && previousFrame[y] == line)
+        continue;
+
+      Console.SetCursorPosition(0, y);
+      Console.Write(line);
+
+      if (y < previousFrame.Count)
+        previousFrame[y] = line;
+      else
+        previousFrame.Add(line);
+    }
+  }
+
   private static Command ParseCommand(string input)
   {
     string[] tokens = Tokenize(input);
 
     if (tokens.Length == 0)
-    {
       throw new FormatException("Empty command.");
-    }
 
     List<Argument> arguments = [];
 
@@ -135,10 +419,7 @@ internal static class Program
       string token = tokens[i];
 
       if (!IsOption(token))
-      {
-        throw new FormatException(
-          $"Unexpected argument: {token}");
-      }
+        throw new FormatException($"Unexpected argument: {token}");
 
       string option = token.TrimStart('-');
       string name;
@@ -156,17 +437,12 @@ internal static class Program
         name = option;
         value = "true";
 
-        if (i + 1 < tokens.Length &&
-            !IsOption(tokens[i + 1]))
-        {
+        if (i + 1 < tokens.Length && !IsOption(tokens[i + 1]))
           value = tokens[++i];
-        }
       }
 
       if (string.IsNullOrWhiteSpace(name))
-      {
         throw new FormatException("Invalid option name.");
-      }
 
       arguments.Add(new Argument
       {
@@ -204,13 +480,9 @@ internal static class Program
       if (quote != '\0')
       {
         if (character == quote)
-        {
           quote = '\0';
-        }
         else
-        {
           current.Append(character);
-        }
 
         continue;
       }
@@ -239,14 +511,10 @@ internal static class Program
     }
 
     if (quote != '\0')
-    {
       throw new FormatException("Unclosed quotation mark.");
-    }
 
     if (started)
-    {
       tokens.Add(current.ToString());
-    }
 
     return tokens.ToArray();
   }

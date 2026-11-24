@@ -5,8 +5,9 @@ using StarBridger.Core.Services;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
-using StarBridger.IPC.Utils;
 using System.Text;
+using StarBridger.Contracts.Host;
+using StarBridger.Core.Utils;
 
 namespace StarBridger.Host;
 
@@ -55,7 +56,7 @@ internal static class ShellReceiver
     IReadOnlyList<CommandDefinition> definitions =
       shell.GetCommandDefinitions();
 
-    if (command.Arguments.TryGetValue("json", out object? jsonValue))
+    if (command.Arguments.HasRawFlag())
     {
       data?.Invoke(definitions);
       return Task.CompletedTask;
@@ -98,7 +99,7 @@ internal static class ShellReceiver
     return Task.CompletedTask;
   }
 
-  private static async Task GetStatus(Command _, Action<string>? output, Action<object>? data, CancellationToken cancellationToken)
+  private static async Task GetStatus(Command command, Action<string>? output, Action<object>? data, CancellationToken cancellationToken)
   {
     using Process process = Process.GetCurrentProcess();
 
@@ -122,6 +123,21 @@ internal static class ShellReceiver
 
     double workingSetMb = process.WorkingSet64 / 1024.0 / 1024.0;
     double managedMemoryMb = GC.GetTotalMemory(false) / 1024.0 / 1024.0;
+
+    if (command.Arguments.HasRawFlag())
+    {
+      data?.Invoke(new HostStatus
+      {
+        HostPath = System.Reflection.Assembly.GetEntryAssembly()?.Location ?? "",
+        CpuUsage = cpuPercent,
+        MemoryManaged = managedMemoryMb,
+        MemoryWorkingSet = workingSetMb,
+        ProcessID = process.Id,
+        ThreadsCount = process.Threads.Count,
+        UpTime = uptime
+      });
+      return;
+    }
 
     output?.Invoke("=== StarBridger Host Status ===");
     output?.Invoke("Status: Running");

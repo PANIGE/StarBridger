@@ -159,7 +159,7 @@ public sealed class ShellIpcService : BackgroundService
             }
           }
 
-          void data(object payload)
+          void data(object? payload)
           {
             string response = JsonConvert.SerializeObject(new DataShellResponse
             {

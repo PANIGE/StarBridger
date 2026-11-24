@@ -11,6 +11,7 @@ using StarBridger.Contracts.Telemetry;
 using StarBridger.Contracts.Telemetry.Game.v1;
 using StarBridger.Core.Managers;
 using StarBridger.Core.Services;
+using StarBridger.Core.Utils;
 using StarBridger.Telemetry.Utils;
 using System;
 using System.Threading;
@@ -290,17 +291,24 @@ public sealed class StarCitizenTelemetryService : BackgroundService
       Description = "Extract the latest telemetry data to a JSON file",
     };
 
-    _shell.RegisterCommand(extractCommand, (_, output, _, cancellationToken) =>
+    _shell.RegisterCommand(extractCommand, (command, output, data, cancellationToken) =>
     {
+      bool raw = command.Arguments.HasRawFlag();
       cancellationToken.ThrowIfCancellationRequested();
       string? filePath = CreateExtractJson();
       if (filePath is null)
       {
-        output?.Invoke("No telemetry data available to extract.");
+        if (raw)
+          data?.Invoke(null);
+        else 
+          output?.Invoke("No telemetry data available to extract.");
         throw new InvalidOperationException("No telemetry data available to extract.");
       }
 
-      output?.Invoke($"Writing telemetry extract to : {filePath}");
+      if (raw)
+        data?.Invoke(filePath);
+      else
+        output?.Invoke($"Writing telemetry extract to : {filePath}");
       return Task.CompletedTask;
     });
 

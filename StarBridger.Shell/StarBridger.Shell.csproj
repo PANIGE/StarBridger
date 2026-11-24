@@ -8,7 +8,7 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\StarBridger.Contracts\StarBridger.Contracts.csproj" />
+    <ProjectReference Include="..\StarBridger.SDK\StarBridger.SDK.csproj" />
   </ItemGroup>
 
 </Project>

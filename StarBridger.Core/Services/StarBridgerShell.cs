@@ -83,7 +83,7 @@ public sealed class StarBridgerShell : IHostedService
 
   #endregion
 
-  public async Task<bool> ExecuteCommand(Command command, Action<string>? output, Action<object>? data, CancellationToken cancellationToken)
+  public async Task<bool> ExecuteCommand(Command command, Action<string>? output, Action<object?>? data, CancellationToken cancellationToken)
   {
     ArgumentNullException.ThrowIfNull(command);
     CommandHandler? handler;
@@ -142,5 +142,5 @@ public sealed class StarBridgerShell : IHostedService
   }
   #endregion
 
-  public delegate Task CommandHandler(Command command, Action<string>? output, Action<object>? data, CancellationToken cancellationToken);
+  public delegate Task CommandHandler(Command command, Action<string>? output, Action<object?>? data, CancellationToken cancellationToken);
 }

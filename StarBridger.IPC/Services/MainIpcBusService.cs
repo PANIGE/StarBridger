@@ -7,7 +7,6 @@ using StarBridger.Contracts.Telemetry.Game;
 using StarBridger.Core.Managers;
 using StarBridger.Core.Services;
 using StarBridger.Core.Utils;
-using StarBridger.IPC.Utils;
 using System.Collections.Concurrent;
 using System.IO.Pipes;
 
