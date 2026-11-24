@@ -38,7 +38,6 @@ public sealed class StarCitizenTelemetryService : BackgroundService
   private DateTimeOffset? _lastConnectedAtUtc;
   private DateTimeOffset _lastConnectionPublishAtUtc;
 
-
   public StateStore<VehicleTelemetry> Vehicle { get; }
   public StateStore<ActorTelemetry> Actor { get; }
   public StateStore<WeaponsTelemetry> Weapons { get; }
@@ -62,7 +61,6 @@ public sealed class StarCitizenTelemetryService : BackgroundService
   }
 
   #region Service Execution
-
 
   protected override async Task ExecuteAsync(CancellationToken stoppingToken)
   {
@@ -200,7 +198,7 @@ public sealed class StarCitizenTelemetryService : BackgroundService
       }
 
       if (frame.Vehicle?.State is Game.VehicleState vehicle &&
-          TelemetryComparer.HasChanged(previousVehicle, frame.Vehicle))
+          TelemetryComparer.HasVehicleChanged(previousVehicle, frame.Vehicle))
       {
         Vehicle.Publish(StarCitizenTelemetryMapper.MapVehicle(vehicle));
       }
@@ -363,7 +361,6 @@ public sealed class StarCitizenTelemetryService : BackgroundService
       return true;
     }
   }
-
 
   #endregion
 }
