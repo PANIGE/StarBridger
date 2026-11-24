@@ -1,13 +1,15 @@
 ﻿using Newtonsoft.Json;
 using Newtonsoft.Json.Converters;
 using StarBridger.Contracts.Enums;
+using StarBridger.Contracts.Telemetry.Game.v1;
+using StarBridger.Contracts.Telemetry.Game.Versionning;
 using System;
 using System.Collections.Generic;
 using System.Text;
 
 namespace StarBridger.Contracts.Telemetry;
 
-public sealed record StarCitizenConnectionInfo
+public sealed record StarCitizenConnectionInfo : ContractV1, IConnectionTelemetry
 {
   [JsonProperty("status")]
   [JsonConverter(typeof(StringEnumConverter))]

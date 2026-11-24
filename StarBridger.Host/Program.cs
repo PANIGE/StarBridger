@@ -9,6 +9,7 @@ using StarBridger.Host;
 using StarBridger.Host.Utils;
 using StarBridger.IPC.Services;
 using StarBridger.Telemetry;
+using StarBridger.Telemetry.Versionning;
 
 internal class Program
 {
@@ -67,7 +68,7 @@ internal class Program
   {
     MainIpcBusService ipc = host.Services.GetRequiredService<MainIpcBusService>();
     StarCitizenTelemetryService telemetry = host.Services.GetRequiredService<StarCitizenTelemetryService>();
-    ipc.AddEventListener(telemetry.Connection, Intents.GameConnection);
+    ipc.AddEventListener(telemetry.Connection, Intents.GameConnection, ContractDowngrader.Downgrade);
     ipc.AddEventListener(telemetry.Vehicle, Intents.Vehicle);
     ipc.AddEventListener(telemetry.Actor, Intents.Actor);
     ipc.AddEventListener(telemetry.Weapons, Intents.Weapons);

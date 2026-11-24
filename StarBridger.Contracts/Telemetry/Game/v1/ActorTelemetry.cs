@@ -1,8 +1,9 @@
 using Newtonsoft.Json;
+using StarBridger.Contracts.Telemetry.Game.Versionning;
 
-namespace StarBridger.Contracts.Telemetry.Game;
+namespace StarBridger.Contracts.Telemetry.Game.v1;
 
-public sealed record ActorTelemetry
+public sealed record ActorTelemetry : ContractV1, IActorTelemetry
 {
   [JsonProperty("vitals")]
   public ActorVitalsTelemetry? Vitals { get; init; }
@@ -14,7 +15,7 @@ public sealed record ActorTelemetry
   public ActorEnvironmentTelemetry? Environment { get; init; }
 }
 
-public sealed record ActorVitalsTelemetry
+public sealed record ActorVitalsTelemetry : ContractV1, IActorTelemetry
 {
   [JsonProperty("health")]
   public TelemetryGauge? Health { get; init; }
@@ -44,7 +45,7 @@ public sealed record ActorVitalsTelemetry
   public int IntoxicationLevel { get; init; }
 }
 
-public sealed record ActorStateTelemetry
+public sealed record ActorStateTelemetry : ContractV1, IActorTelemetry
 {
   [JsonProperty("locomotion")]
   public ActorLocomotionState Locomotion { get; init; }
@@ -59,7 +60,7 @@ public sealed record ActorStateTelemetry
   public long UecBalance { get; init; }
 }
 
-public sealed record ActorEnvironmentTelemetry
+public sealed record ActorEnvironmentTelemetry : ContractV1, IActorTelemetry
 {
   [JsonProperty("external_temperature")]
   public float ExternalTemperature { get; init; }

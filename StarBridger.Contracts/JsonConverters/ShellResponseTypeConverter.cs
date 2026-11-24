@@ -12,7 +12,7 @@ internal class ShellResponseTypeConverter : JsonConverter
 {
   public override bool CanConvert(Type objectType)
   {
-    return objectType == typeof(ShellResponse);
+    return typeof(ShellResponse).IsAssignableFrom(objectType);
   }
 
   public override object? ReadJson(JsonReader reader, Type objectType, object? existingValue, JsonSerializer serializer)
@@ -44,6 +44,11 @@ internal class ShellResponseTypeConverter : JsonConverter
         ErrorMessage = json.Value<string>("error") ?? string.Empty
       },
 
+      ShellResponseType.Data => new DataShellResponse
+      {
+        Payload =  json["payload"]?.DeepClone() ?? throw new JsonSerializationException("Missing data payload.")
+      },
+
       _ => throw new JsonSerializationException($"Unsupported ShellResponse type: {type}")
     };
   }
@@ -66,6 +71,12 @@ internal class ShellResponseTypeConverter : JsonConverter
         ["type"] = "completed",
         ["success"] = completed.Success,
         ["error"] = completed.ErrorMessage
+      },
+
+      DataShellResponse data => new JObject
+      {
+        ["type"] = "data",
+        ["payload"] = data.Payload != null ? JToken.FromObject(data.Payload, serializer) : null
       },
 
       _ => throw new JsonSerializationException(

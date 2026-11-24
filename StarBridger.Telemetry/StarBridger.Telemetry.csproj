@@ -11,7 +11,7 @@
   </ItemGroup>
 
 	<ItemGroup>
-		<Protobuf Include="Protos\star_citizen_telemetry.proto" GrpcServices="Client" />
+		<Protobuf Include="Protos\v1\star_citizen_telemetry.proto" GrpcServices="Client" />
 	</ItemGroup>
 
   <ItemGroup>

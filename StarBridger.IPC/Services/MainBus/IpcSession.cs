@@ -2,6 +2,7 @@
 using Newtonsoft.Json;
 using StarBridger.Contracts.Enums;
 using StarBridger.Contracts.IPC.MainBus;
+using StarBridger.Contracts.Telemetry.Game;
 using System.IO.Pipes;
 using System.Text;
 using System.Threading.Channels;
@@ -17,6 +18,8 @@ internal sealed class IpcSession
       });
 
   public Guid PipeID { get; } = Guid.NewGuid();
+
+  public Version Version { get; set; } = Constants.LatestVersion;
 
   public Intents Intents { get; set; } = Intents.All;
 

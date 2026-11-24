@@ -1,8 +1,9 @@
 using Newtonsoft.Json;
+using StarBridger.Contracts.Telemetry.Game.Versionning;
 
-namespace StarBridger.Contracts.Telemetry.Game;
+namespace StarBridger.Contracts.Telemetry.Game.v1;
 
-public sealed record TelemetryGauge
+public sealed record TelemetryGauge : ContractV1, ICommonTelemetry
 {
   [JsonProperty("current")]
   public float Current { get; init; }
@@ -11,7 +12,7 @@ public sealed record TelemetryGauge
   public float Max { get; init; }
 }
 
-public sealed record TelemetryAvailability
+public sealed record TelemetryAvailability : ContractV1, ICommonTelemetry
 {
   [JsonProperty("enabled")]
   public bool Enabled { get; init; }

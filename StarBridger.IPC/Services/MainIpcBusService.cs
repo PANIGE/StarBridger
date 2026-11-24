@@ -3,8 +3,10 @@ using Microsoft.Extensions.Logging;
 using StarBridger.Contracts.Core.Shell;
 using StarBridger.Contracts.Core.Shell.Definitions;
 using StarBridger.Contracts.Enums;
+using StarBridger.Contracts.Telemetry.Game;
 using StarBridger.Core.Managers;
 using StarBridger.Core.Services;
+using StarBridger.Core.Utils;
 using StarBridger.IPC.Utils;
 using System.Collections.Concurrent;
 using System.IO.Pipes;
@@ -140,7 +142,7 @@ public class MainIpcBusService : BackgroundService
     }
   }
 
-  public bool AddEventListener<TEvent>(EventManager<TEvent> eventManager, Intents intents) where TEvent : class
+  public bool AddEventListener<TEvent>(EventManager<TEvent> eventManager, Intents intents, Func<object, Version, object>? middleware = null) where TEvent : class
   {
     try
     {
@@ -157,7 +159,24 @@ public class MainIpcBusService : BackgroundService
 
           foreach (IpcSession session in _sessions.Values)
           {
-            session.Send(eventData, intents);
+            try
+            {
+              object? payload = eventData;
+              if (middleware is not null)
+              {
+                payload = middleware(eventData, session.Version);
+              }
+
+              session.Send(payload, intents);
+            }
+            catch (Exception ex)
+            {
+              _logger.LogError(
+                ex,
+                "Error sending event {EventType} to session {PipeID}",
+                typeof(TEvent).Name,
+                session.PipeID);
+            }
           }
         }
       }, MainIpcId);
@@ -206,9 +225,66 @@ public class MainIpcBusService : BackgroundService
     };
 
     _shell.RegisterCommand(setIntent, SetIntentCommand);
+
+    CommandDefinition setVersion = new()
+    {
+      Name = "version.set",
+      Service = nameof(IPC),
+      Description = "Sets the version for a Main IPC connection.",
+      Arguments =
+      [
+        new()
+        {
+          Name = "version",
+          Description = "The version to set",
+          IsRequired = true
+        },
+        new()
+        {
+          Name = "id",
+          Description = "The ID of the session Pipe for which to set the version",
+          IsRequired = true
+        },
+      ]
+    };
+
+    _shell.RegisterCommand(setVersion, SetVersionCommand);
   }
 
-  private Task SetIntentCommand(Command command, Action<string>? output, CancellationToken cancellationToken)
+  private Task SetVersionCommand(Command command, Action<string>? output, Action<object>? data, CancellationToken cancellationToken)
+  {
+    if (!command.Arguments.TryGetValue("version", out string? versionString) ||
+        !command.Arguments.TryGetValue("id", out string? idString) ||
+        !Guid.TryParse(idString, out Guid pipeId) ||
+        !Version.TryParse(versionString, out Version? version))
+    {
+      output?.Invoke("Invalid arguments. check that all arguments are provided and valid.");
+      throw new ArgumentException("Invalid arguments for version.set command");
+    }
+
+    version = version.Normalize();
+
+    if (version < Constants.LowestSupportedVersion || version > Constants.LatestVersion)
+    {
+      output?.Invoke($"Version {version} is not supported. Supported versions are between {Constants.LowestSupportedVersion} and {Constants.LatestVersion}.");
+      throw new ArgumentException("Unsupported version for version.set command");
+    }
+
+    if (_sessions.TryGetValue(pipeId, out IpcSession? session))
+    {
+      session.Version = version;
+      output?.Invoke($"Version for session {pipeId} set to {version}");
+    }
+    else
+    {
+      output?.Invoke($"No session found with ID {pipeId}");
+      throw new KeyNotFoundException($"No Main IPC session found with ID {pipeId}");
+    }
+
+    return Task.CompletedTask;
+  }
+
+  private Task SetIntentCommand(Command command, Action<string>? output, Action<object>? data, CancellationToken cancellationToken)
   {
     if (!command.Arguments.TryGetValue("intents", out string? intentsString) ||
         !command.Arguments.TryGetValue("id", out string? idString) ||

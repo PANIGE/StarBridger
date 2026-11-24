@@ -5,9 +5,9 @@ using System.Text;
 
 namespace StarBridger.IPC.Utils;
 
-internal static class Extensions
+public static class Extensions
 {
-  internal static bool TryGetValue<TOut>(this Argument[] arguments, string name, out TOut value)
+  public static bool TryGetValue<TOut>(this Argument[] arguments, string name, out TOut value)
   {
     Argument? argument = Array.Find(arguments, a => a.Name.Equals(name, StringComparison.OrdinalIgnoreCase));
     if (argument is not null)

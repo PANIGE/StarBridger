@@ -159,7 +159,19 @@ public sealed class ShellIpcService : BackgroundService
             }
           }
 
-          bool success = await _shell.ExecuteCommand(command, output, cancellationToken);
+          void data(object payload)
+          {
+            string response = JsonConvert.SerializeObject(new DataShellResponse
+            {
+              Payload = payload
+            });
+            if (!responses.Writer.TryWrite(response))
+            {
+              _logger.LogWarning("Shell data queue full for {Command}", command.CommandText);
+            }
+          }
+
+          bool success = await _shell.ExecuteCommand(command, output, data, cancellationToken);
 
           await responses.Writer.WriteAsync(
             JsonConvert.SerializeObject(new CompletedShellResponse

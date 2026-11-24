@@ -8,7 +8,7 @@ using Sc.Game.Telemetry.V1;
 using StarBridger.Contracts.Core.Shell.Definitions;
 using StarBridger.Contracts.Enums;
 using StarBridger.Contracts.Telemetry;
-using StarBridger.Contracts.Telemetry.Game;
+using StarBridger.Contracts.Telemetry.Game.v1;
 using StarBridger.Core.Managers;
 using StarBridger.Core.Services;
 using StarBridger.Telemetry.Utils;
@@ -290,7 +290,7 @@ public sealed class StarCitizenTelemetryService : BackgroundService
       Description = "Extract the latest telemetry data to a JSON file",
     };
 
-    _shell.RegisterCommand(extractCommand, (_, output, cancellationToken) =>
+    _shell.RegisterCommand(extractCommand, (_, output, _, cancellationToken) =>
     {
       cancellationToken.ThrowIfCancellationRequested();
       string? filePath = CreateExtractJson();
@@ -311,7 +311,7 @@ public sealed class StarCitizenTelemetryService : BackgroundService
       Description = "Reconnects the Star Citizen telemetry stream."
     };
 
-    _shell.RegisterCommand(reconnectCommand, (_, output, cancellationToken) =>
+    _shell.RegisterCommand(reconnectCommand, (_, output, _, cancellationToken) =>
       {
         cancellationToken.ThrowIfCancellationRequested();
 
@@ -329,7 +329,7 @@ public sealed class StarCitizenTelemetryService : BackgroundService
       Description = "Get the status of the Star Citizen telemetry connection."
     };
 
-    _shell.RegisterCommand(statusCommand, (_, output, cancellationToken) =>
+    _shell.RegisterCommand(statusCommand, (_, output, _, cancellationToken) =>
       {
         cancellationToken.ThrowIfCancellationRequested();
 

@@ -1,4 +1,4 @@
-using StarBridger.Contracts.Telemetry.Game;
+using StarBridger.Contracts.Telemetry.Game.v1;
 using System;
 using System.Linq;
 using Game = Sc.Game.Telemetry.V1;

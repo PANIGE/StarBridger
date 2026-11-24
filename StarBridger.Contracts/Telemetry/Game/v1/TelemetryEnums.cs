@@ -2,7 +2,7 @@ using Newtonsoft.Json;
 using Newtonsoft.Json.Converters;
 using System.Runtime.Serialization;
 
-namespace StarBridger.Contracts.Telemetry.Game;
+namespace StarBridger.Contracts.Telemetry.Game.v1;
 
 [JsonConverter(typeof(StringEnumConverter))]
 public enum VehicleType

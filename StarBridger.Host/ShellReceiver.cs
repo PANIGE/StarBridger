@@ -5,6 +5,7 @@ using StarBridger.Core.Services;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
+using StarBridger.IPC.Utils;
 using System.Text;
 
 namespace StarBridger.Host;
@@ -30,15 +31,15 @@ internal static class ShellReceiver
           Name = "Shutdown",
           Description = "Shutdown StarBridger",
           Arguments = Array.Empty<ArgumentDefinition>()
-        }, async (_, output, cancellationToken) => Shutdown(output, cancellationToken, lifetime)),
+        }, async (_, output, data, cancellationToken) => Shutdown(output, cancellationToken, lifetime)),
       (new CommandDefinition
         {
           Service = nameof(Host),
           Name = "Help",
           Description = "Lists all available commands and their arguments."
         },
-        (_, output, cancellationToken) =>
-          GetHelp(output, cancellationToken, shell)),
+        (command, output, data, cancellationToken) =>
+          GetHelp(command, output, data, cancellationToken, shell)),
     };
 
     foreach ((CommandDefinition definition, StarBridgerShell.CommandHandler handler) in commands)
@@ -47,12 +48,18 @@ internal static class ShellReceiver
     }
   }
 
-  private static Task GetHelp(Action<string>? output, CancellationToken cancellationToken, StarBridgerShell shell)
+  private static Task GetHelp(Command command, Action<string>? output, Action<object>? data, CancellationToken cancellationToken, StarBridgerShell shell)
   {
     cancellationToken.ThrowIfCancellationRequested();
 
     IReadOnlyList<CommandDefinition> definitions =
       shell.GetCommandDefinitions();
+
+    if (command.Arguments.TryGetValue("json", out object? jsonValue))
+    {
+      data?.Invoke(definitions);
+      return Task.CompletedTask;
+    }
 
     output?.Invoke("=== StarBridger Commands ===");
 
@@ -91,7 +98,7 @@ internal static class ShellReceiver
     return Task.CompletedTask;
   }
 
-  private static async Task GetStatus(Command _, Action<string>? output, CancellationToken cancellationToken)
+  private static async Task GetStatus(Command _, Action<string>? output, Action<object>? data, CancellationToken cancellationToken)
   {
     using Process process = Process.GetCurrentProcess();
 

@@ -7,5 +7,6 @@ namespace StarBridger.Contracts.Enums;
 public enum ShellResponseType
 {
   Output,
+  Data,
   Completed
 }

@@ -11,5 +11,5 @@ namespace StarBridger.Contracts.IPC.Shell;
 public abstract class ShellResponse
 {
   [JsonProperty("type")]
-  public virtual ShellResponseType Type { get; }
+  public abstract ShellResponseType Type { get; }
 }

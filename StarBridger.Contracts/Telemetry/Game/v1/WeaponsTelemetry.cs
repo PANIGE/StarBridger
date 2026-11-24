@@ -1,8 +1,9 @@
 using Newtonsoft.Json;
+using StarBridger.Contracts.Telemetry.Game.Versionning;
 
-namespace StarBridger.Contracts.Telemetry.Game;
+namespace StarBridger.Contracts.Telemetry.Game.v1;
 
-public sealed record WeaponsTelemetry
+public sealed record WeaponsTelemetry : ContractV1, IWeaponTelemetry
 {
   [JsonProperty("settings")]
   public WeaponsSettingsTelemetry? Settings { get; init; }
@@ -20,7 +21,7 @@ public sealed record WeaponsTelemetry
   public CountermeasureTelemetry[] Countermeasures { get; init; } = [];
 }
 
-public sealed record WeaponsSettingsTelemetry
+public sealed record WeaponsSettingsTelemetry : ContractV1, IWeaponTelemetry
 {
   [JsonProperty("fallback_convergence_distance")]
   public bool FallbackConvergenceDistance { get; init; }
@@ -47,7 +48,7 @@ public sealed record WeaponsSettingsTelemetry
   public bool GimbalsLocked { get; init; }
 }
 
-public sealed record WeaponTelemetry
+public sealed record WeaponTelemetry : ContractV1, IWeaponTelemetry
 {
   [JsonProperty("name")]
   public string Name { get; init; } = string.Empty;
@@ -62,7 +63,7 @@ public sealed record WeaponTelemetry
   public bool ContainedInPreset { get; init; }
 }
 
-public sealed record CountermeasureTelemetry
+public sealed record CountermeasureTelemetry : ContractV1, IWeaponTelemetry
 {
   [JsonProperty("type")]
   public CountermeasureType Type { get; init; }

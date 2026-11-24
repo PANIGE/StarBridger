@@ -1,8 +1,9 @@
 using Newtonsoft.Json;
+using StarBridger.Contracts.Telemetry.Game.Versionning;
 
-namespace StarBridger.Contracts.Telemetry.Game;
+namespace StarBridger.Contracts.Telemetry.Game.v1;
 
-public sealed record VehicleTelemetry
+public sealed record VehicleTelemetry : ContractV1, IVehicleTelemetry
 {
   [JsonProperty("name")]
   public string Name { get; init; } = string.Empty;
@@ -41,7 +42,7 @@ public sealed record VehicleTelemetry
   public VehicleMasterModeTelemetry? MasterMode { get; init; }
 }
 
-public sealed record VehicleDoorsTelemetry
+public sealed record VehicleDoorsTelemetry : ContractV1, IVehicleTelemetry
 {
   [JsonProperty("open_state")]
   public VehicleDoorOpenState OpenState { get; init; }
@@ -50,7 +51,7 @@ public sealed record VehicleDoorsTelemetry
   public VehicleDoorLockState LockState { get; init; }
 }
 
-public sealed record VehicleFlightTelemetry
+public sealed record VehicleFlightTelemetry : ContractV1, IVehicleTelemetry
 {
   [JsonProperty("state")]
   public VehicleFlightStateTelemetry? State { get; init; }
@@ -62,7 +63,7 @@ public sealed record VehicleFlightTelemetry
   public VehicleFlightInstrumentsTelemetry? Instruments { get; init; }
 }
 
-public sealed record VehicleFlightStateTelemetry
+public sealed record VehicleFlightStateTelemetry : ContractV1, IVehicleTelemetry
 {
   [JsonProperty("is_landed")]
   public bool IsLanded { get; init; }
@@ -77,7 +78,7 @@ public sealed record VehicleFlightStateTelemetry
   public VehicleComponentDeploymentState? Transformation { get; init; }
 }
 
-public sealed record VehicleFlightSettingsTelemetry
+public sealed record VehicleFlightSettingsTelemetry : ContractV1, IVehicleTelemetry
 {
   [JsonProperty("ifcs_coupled")]
   public TelemetryAvailability? IfcsCoupled { get; init; }
@@ -137,7 +138,7 @@ public sealed record VehicleFlightSettingsTelemetry
   public bool FlightLightAmplification { get; init; }
 }
 
-public sealed record VehicleFlightInstrumentsTelemetry
+public sealed record VehicleFlightInstrumentsTelemetry : ContractV1, IVehicleTelemetry
 {
   [JsonProperty("speed")]
   public float Speed { get; init; }
@@ -170,7 +171,7 @@ public sealed record VehicleFlightInstrumentsTelemetry
   public float Heading { get; init; }
 }
 
-public sealed record VehicleThrusterBoostTelemetry
+public sealed record VehicleThrusterBoostTelemetry : ContractV1, IVehicleTelemetry
 {
   [JsonProperty("engaged")]
   public bool Engaged { get; init; }
@@ -185,7 +186,7 @@ public sealed record VehicleThrusterBoostTelemetry
   public bool Critical { get; init; }
 }
 
-public sealed record VehiclePowerTelemetry
+public sealed record VehiclePowerTelemetry : ContractV1, IVehicleTelemetry
 {
   [JsonProperty("powerplants")]
   public bool Powerplants { get; init; }
@@ -215,7 +216,7 @@ public sealed record VehiclePowerTelemetry
   public bool ShieldEmitters { get; init; }
 }
 
-public sealed record VehicleAnnunciatorsTelemetry
+public sealed record VehicleAnnunciatorsTelemetry : ContractV1, IVehicleTelemetry
 {
   [JsonProperty("pwr")]
   public VehicleAnnunciatorState Pwr { get; init; }
@@ -248,7 +249,7 @@ public sealed record VehicleAnnunciatorsTelemetry
   public VehicleAnnunciatorState Misl { get; init; }
 }
 
-public sealed record VehicleShieldsTelemetry
+public sealed record VehicleShieldsTelemetry : ContractV1, IVehicleTelemetry
 {
   [JsonProperty("level")]
   public float Level { get; init; }
@@ -257,7 +258,7 @@ public sealed record VehicleShieldsTelemetry
   public float[] Faces { get; init; } = [];
 }
 
-public sealed record VehicleMasterModeTelemetry
+public sealed record VehicleMasterModeTelemetry : ContractV1, IVehicleTelemetry
 {
   [JsonProperty("mode")]
   public VehicleMasterMode Mode { get; init; }
