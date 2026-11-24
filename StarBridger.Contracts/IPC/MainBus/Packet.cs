@@ -13,6 +13,6 @@ public class Packet
   [JsonConverter(typeof(StringEnumConverter))]
   public Intents Type { get; init; }
 
-  [JsonProperty("payload")] 
+  [JsonProperty("payload")]
   public object? Payload { get; init; }
 }

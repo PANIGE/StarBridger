@@ -1,5 +1,6 @@
 ﻿using Microsoft.Extensions.Hosting;
 using Serilog;
+using StarBridger.Contracts.Core.IO;
 using System;
 using System.Collections.Generic;
 using System.Text;
@@ -10,23 +11,7 @@ internal static class LogUtils
 {
   internal static string GetLogsPath()
   {
-    if (OperatingSystem.IsWindows())
-      return 
-        Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData),
-          "StarBridger", 
-          "Logs");
-
-    if (OperatingSystem.IsLinux())
-    {
-      string? state = Environment.GetEnvironmentVariable("XDG_STATE_HOME");
-
-      if (string.IsNullOrWhiteSpace(state) || !Path.IsPathFullyQualified(state))
-        state = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.UserProfile), ".local", "state");
-
-      return Path.Combine(state, "starbridger", "logs");
-    }
-
-    return Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData), "StarBridger", "Logs");
+    return Path.Combine(Folders.DataDirectory, "Logs");
   }
 
   internal static void ConfigureLogging()

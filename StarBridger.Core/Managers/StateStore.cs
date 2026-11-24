@@ -1,27 +1,27 @@
 ﻿
-using System;
 using Microsoft.Extensions.Logging;
+using System;
 
 namespace StarBridger.Core.Managers;
 
 public class StateStore<TState> : EventManager<TState> where TState : class
 {
-  private TState _state;
+  public TState State { get; private set; }
 
   public StateStore(TState initialState, ILogger logger) : base(logger)
   {
     ArgumentNullException.ThrowIfNull(initialState);
-    _state = initialState;
+    State = initialState;
   }
 
   protected override void CaptureInitialEvent(Subscription<TState> subscription)
   {
-    subscription.Queue.Writer.TryWrite(_state);
+    subscription.Queue.Writer.TryWrite(State);
   }
 
   protected override TState PreparePublication(TState state)
   {
-    _state = state;
+    State = state;
     return state;
   }
 }

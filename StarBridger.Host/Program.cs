@@ -3,10 +3,12 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
 using Serilog;
+using StarBridger.Contracts.Enums;
 using StarBridger.Core.Services;
 using StarBridger.Host;
 using StarBridger.Host.Utils;
 using StarBridger.IPC.Services;
+using StarBridger.Telemetry;
 
 internal class Program
 {
@@ -56,5 +58,16 @@ internal class Program
     services.AddSingletonHostedService<StarBridgerShell>();
     services.AddSingletonHostedService<MainIpcBusService>();
     services.AddSingletonHostedService<ShellIpcService>();
+    services.AddSingletonHostedService<StarCitizenTelemetryService>();
+  }
+
+  private static void ConfigureIpcConnections(IHost host)
+  {
+    MainIpcBusService ipc = host.Services.GetRequiredService<MainIpcBusService>();
+    StarCitizenTelemetryService telemetry = host.Services.GetRequiredService<StarCitizenTelemetryService>();
+    ipc.AddEventListener(telemetry.Connection, Intents.GameConnection);
+    ipc.AddEventListener(telemetry.Vehicle, Intents.Vehicle);
+    ipc.AddEventListener(telemetry.Actor, Intents.Actor);
+    ipc.AddEventListener(telemetry.Weapons, Intents.Weapons);
   }
 }

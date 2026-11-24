@@ -14,7 +14,7 @@ public sealed class StarBridgerShell : IHostedService
   private readonly ILogger _logger;
   private readonly Dictionary<string, CommandHandler> _commands = new(StringComparer.OrdinalIgnoreCase);
   private readonly List<CommandDefinition> _definitions = new();
-  private readonly StateStore<List<CommandDefinition>> _definitionStore; 
+  private readonly StateStore<List<CommandDefinition>> _definitionStore;
   private readonly object _sync = new();
 
   public StarBridgerShell(ILogger<StarBridgerShell> logger)
@@ -40,7 +40,7 @@ public sealed class StarBridgerShell : IHostedService
 
     _definitionStore.Publish(_definitions.ToList());
 
-    _logger.LogInformation("Registered command {CommandText}",definition.CommandText);
+    _logger.LogInformation("Registered command {CommandText}", definition.CommandText);
   }
 
   public void UnregisterCommand(CommandDefinition definition)

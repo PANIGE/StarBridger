@@ -21,7 +21,7 @@ public sealed class ShellIpcService : BackgroundService
   private readonly StarBridgerShell _shell;
   private readonly ILogger<ShellIpcService> _logger;
 
-  public ShellIpcService(StarBridgerShell shell,  ILogger<ShellIpcService> logger)
+  public ShellIpcService(StarBridgerShell shell, ILogger<ShellIpcService> logger)
   {
     _shell = shell;
     _logger = logger;
@@ -159,7 +159,7 @@ public sealed class ShellIpcService : BackgroundService
             }
           }
 
-          bool success = await _shell.ExecuteCommand(command, output,cancellationToken);
+          bool success = await _shell.ExecuteCommand(command, output, cancellationToken);
 
           await responses.Writer.WriteAsync(
             JsonConvert.SerializeObject(new CompletedShellResponse

@@ -22,13 +22,13 @@ public partial class MainForm : Form
     };
 
     // create a few commands that can be used for the menu and toolbar
-    var clickMe = new Command { MenuText = "Click Me!", ToolBarText = "Click Me!" };
+    Command clickMe = new Command { MenuText = "Click Me!", ToolBarText = "Click Me!" };
     clickMe.Executed += (sender, e) => MessageBox.Show(this, "I was clicked!");
 
-    var quitCommand = new Command { MenuText = "Quit", Shortcut = Application.Instance.CommonModifier | Keys.Q };
+    Command quitCommand = new Command { MenuText = "Quit", Shortcut = Application.Instance.CommonModifier | Keys.Q };
     quitCommand.Executed += (sender, e) => Application.Instance.Quit();
 
-    var aboutCommand = new Command { MenuText = "About..." };
+    Command aboutCommand = new Command { MenuText = "About..." };
     aboutCommand.Executed += (sender, e) => new AboutDialog().ShowDialog(this);
 
     // create menu
