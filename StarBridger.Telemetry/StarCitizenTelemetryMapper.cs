@@ -43,18 +43,18 @@ internal static class StarCitizenTelemetryMapper
       Settings = MapWeaponsSettings(source.Settings),
       PresetIndex = source.PresetIndex,
       PresetName = source.PresetName,
-      Weapons = source.Weapons.Select(weapon => new WeaponTelemetry
+      Weapons = [.. source.Weapons.Select(weapon => new WeaponTelemetry
       {
         Name = weapon.Name,
         IsPowered = weapon.IsPowered,
         ReadyToFire = weapon.ReadyToFire,
         ContainedInPreset = weapon.ContainedInPreset
-      }).ToArray(),
-      Countermeasures = source.Countermeasures.Select(item => new CountermeasureTelemetry
+      })],
+      Countermeasures = [.. source.Countermeasures.Select(item => new CountermeasureTelemetry
       {
         Type = (CountermeasureType) item.Type,
         Amount = item.Amount
-      }).ToArray()
+      })]
     };
   }
 
@@ -208,7 +208,7 @@ internal static class StarCitizenTelemetryMapper
     return source is null ? null : new VehicleShieldsTelemetry
     {
       Level = source.Level,
-      Faces = source.Faces.ToArray()
+      Faces = [.. source.Faces]
     };
   }
 

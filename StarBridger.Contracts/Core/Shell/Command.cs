@@ -11,5 +11,5 @@ public class Command
   public string CommandText { get; init; } = string.Empty;
 
   [JsonProperty("arguments")]
-  public Argument[] Arguments { get; init; } = Array.Empty<Argument>();
+  public Argument[] Arguments { get; init; } = [];
 }

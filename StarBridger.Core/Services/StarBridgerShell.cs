@@ -15,12 +15,12 @@ public sealed class StarBridgerShell : IHostedService
   private readonly Dictionary<string, CommandHandler> _commands = new(StringComparer.OrdinalIgnoreCase);
   private readonly List<CommandDefinition> _definitions = new();
   private readonly StateStore<List<CommandDefinition>> _definitionStore;
-  private readonly object _sync = new();
+  private readonly Lock _sync = new();
 
   public StarBridgerShell(ILogger<StarBridgerShell> logger)
   {
     _logger = logger;
-    _definitionStore = new StateStore<List<CommandDefinition>>(_definitions.ToList(), logger);
+    _definitionStore = new StateStore<List<CommandDefinition>>([.. _definitions], logger);
   }
 
   #region Command Registration
@@ -38,7 +38,7 @@ public sealed class StarBridgerShell : IHostedService
     _commands.Add(definition.CommandText, handler);
     _definitions.Add(definition);
 
-    _definitionStore.Publish(_definitions.ToList());
+    _definitionStore.Publish([.. _definitions]);
 
     _logger.LogInformation("Registered command {CommandText}", definition.CommandText);
   }
@@ -49,7 +49,7 @@ public sealed class StarBridgerShell : IHostedService
     _logger.LogInformation("Unregistering command {CommandText}", definition.CommandText);
     _commands.Remove(definition.CommandText);
     _definitions.RemoveAll(d => d.CommandText == definition.CommandText);
-    _definitionStore.Publish(_definitions.ToList());
+    _definitionStore.Publish([.. _definitions]);
   }
 
   public void UnregisterServiceCommands(string service)
@@ -73,7 +73,7 @@ public sealed class StarBridgerShell : IHostedService
           service,
           StringComparison.OrdinalIgnoreCase));
 
-      _definitionStore.Publish(_definitions.ToList());
+      _definitionStore.Publish([.. _definitions]);
     }
 
     _logger.LogInformation(
@@ -137,7 +137,7 @@ public sealed class StarBridgerShell : IHostedService
   {
     lock (_sync)
     {
-      return _definitions.ToList();
+      return [.. _definitions];
     }
   }
   #endregion

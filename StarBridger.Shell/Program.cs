@@ -7,7 +7,7 @@ using StarBridger.SDK.Controllers;
 using StarBridger.SDK.Controllers.Shell;
 using System.Text;
 
-namespace StarBridger.ConsoleClient;
+namespace StarBridger.Shell;
 
 internal static class Program
 {
@@ -454,7 +454,7 @@ internal static class Program
     return new Command
     {
       CommandText = tokens[0],
-      Arguments = arguments.ToArray()
+      Arguments = [.. arguments]
     };
   }
 
@@ -516,6 +516,6 @@ internal static class Program
     if (started)
       tokens.Add(current.ToString());
 
-    return tokens.ToArray();
+    return [.. tokens];
   }
 }

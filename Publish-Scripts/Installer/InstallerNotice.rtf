@@ -1,0 +1,52 @@
+{\rtf1\ansi\ansicpg1252\deff0\uc1{\fonttbl{\f0 Segoe UI;}}\viewkind4\pard\f0\fs20\sa90 \pard\sa55\fs32 \b StarBridger\b0\par
+\pard\sa140\fs19 \b LICENSE, PRIVACY & THE HOUSE RULES\b0\par
+\pard\sa110\fs20 Hi. If you are reading an installer notice, you are probably a developer, security-conscious, or just wonderfully suspicious. Fair enough. Respect.\par
+\pard\sa40\fs20 \par
+\pard\sa95\fs22 \b TL;DR (because life is short)\b0\par
+\pard\sa90\fs20 StarBridger is free and open source under the MIT License. It reads Star Citizen game telemetry and makes that information available to applications on your own machine. No game-memory hooking, no injected code, no bundled mystery services, and no uploading your in-game telemetry to somebody else's cloud. A local-network bridge is planned, but it will be optional and clearly controlled. Your computer is your home; StarBridger is a guest.\par
+\pard\sa40\fs20 \par
+\pard\sa95\fs22 \b WHAT STARBRIDGER DOES\b0\par
+\pard\sa90\fs20 - Runs a companion Host that listens to telemetry exposed locally by Star Citizen.\par
+\pard\sa90\fs20 - Shares that telemetry with compatible apps through a local SDK and IPC. Examples include ship systems, fuel, flight instruments, weapons, character state (including in-game currency), in-game vitals, and game connection status, when those fields are available.\par
+\pard\sa90\fs20 - Lets you start or stop the Host, inspect its status and issue supported commands through a local UI or Shell.\par
+\pard\sa90\fs20 - May write local diagnostic logs. If you explicitly request a telemetry extract, it can write game-data snapshots to disk.\par
+\pard\sa40\fs20 \par
+\pard\sa95\fs22 \b WHAT IT DOES NOT DO\b0\par
+\pard\sa90\fs20 - It does not inject code into Star Citizen, read the game process memory, bypass anti-cheat, or modify game files as part of its normal operation.\par
+\pard\sa90\fs20 - It does not sell your data, run third-party analytics or send game telemetry to an external StarBridger collection server.\par
+\pard\sa90\fs20 - It does not install a Windows service, silently add startup entries or demand permanent control of your machine.\par
+\pard\sa90\fs20 - It is not an official Cloud Imperium Games or Roberts Space Industries product, nor a promise that experimental game telemetry will always work.\par
+\pard\sa40\fs20 \par
+\pard\sa95\fs22 \b NETWORK ACCESS: TODAY AND LATER\b0\par
+\pard\sa90\fs20 Today, the Host and SDK communicate locally. A Web/LAN transport is planned for the future so another device on your local network can use selected telemetry. That feature is not included merely because it is mentioned here. When implemented, it is intended to be explicitly enabled, with clear controls over access. Anything you choose to share over your LAN may be visible to other devices allowed to connect; do not expose it to untrusted networks.\par
+\pard\sa90\fs20 A future, user-requested update check may contact a release provider such as GitHub to fetch version information and downloads. That is separate from transmitting game telemetry. Ordinary network requests can reveal network metadata to the contacted provider.\par
+\pard\sa40\fs20 \par
+\pard\sa95\fs22 \b INSTALLATION & UNINSTALLATION PHILOSOPHY\b0\par
+\pard\sa90\fs20 StarBridger should stay out of your way. Its installed program files belong in its own application folder. A per-user MSI can register the application with Windows so Windows knows how to uninstall it properly. Start-menu and desktop shortcuts are optional. Temporary files are normal; local diagnostic logs or exports you chose to create may remain until you delete them.\par
+\pard\sa90\fs20 No surprise auto-start, no forced updater, no secret persistence. Close it when you want. Uninstall it when you want. The machine belongs to you, not to this app.\par
+\pard\sa40\fs20 \par
+\pard\sa95\fs22 \b OPEN SOURCE & THIRD-PARTY RIGHTS\b0\par
+\pard\sa90\fs20 StarBridger project code is licensed under the MIT License below. Game names, trademarks and assets belong to their respective owners. Third-party dependencies may have their own license notices. The MIT License does not grant rights to Star Citizen itself.\par
+\pard\sa40\fs20 \par
+\pard\sa95\fs22 \b THE MIT LICENSE\b0\par
+\pard\sa80\fs20 \par
+\pard\sa45\fs20 Copyright (c) 2026 StarBridger contributors\par
+\pard\sa80\fs20 \par
+\pard\sa45\fs20 Permission is hereby granted, free of charge, to any person obtaining a copy\par
+\pard\sa45\fs20 of this software and associated documentation files (the "Software"), to deal\par
+\pard\sa45\fs20 in the Software without restriction, including without limitation the rights\par
+\pard\sa45\fs20 to use, copy, modify, merge, publish, distribute, sublicense, and/or sell\par
+\pard\sa45\fs20 copies of the Software, and to permit persons to whom the Software is\par
+\pard\sa45\fs20 furnished to do so, subject to the following conditions:\par
+\pard\sa80\fs20 \par
+\pard\sa45\fs20 The above copyright notice and this permission notice shall be included in all\par
+\pard\sa45\fs20 copies or substantial portions of the Software.\par
+\pard\sa80\fs20 \par
+\pard\sa45\fs20 THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR\par
+\pard\sa45\fs20 IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,\par
+\pard\sa45\fs20 FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE\par
+\pard\sa45\fs20 AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER\par
+\pard\sa45\fs20 LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,\par
+\pard\sa45\fs20 OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE\par
+\pard\sa45\fs20 SOFTWARE.\par
+}

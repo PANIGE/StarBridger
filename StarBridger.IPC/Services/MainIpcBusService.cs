@@ -31,7 +31,7 @@ public class MainIpcBusService : BackgroundService
     RegisterShellCommands();
   }
 
-  private readonly object _broadcastLock = new();
+  private readonly Lock _broadcastLock = new();
 
   #region Service Execution
   protected override async Task ExecuteAsync(CancellationToken stoppingToken)
@@ -85,7 +85,7 @@ public class MainIpcBusService : BackgroundService
 
     lock (_broadcastLock)
     {
-      unsubscribeActions = _eventSubscriptions.Values.ToArray();
+      unsubscribeActions = [.. _eventSubscriptions.Values];
       _eventSubscriptions.Clear();
     }
 

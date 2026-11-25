@@ -14,7 +14,7 @@ public sealed class ShellCommandResult
 
   private CompletedShellResponse? _completion;
 
-  private readonly object _dataLock = new();
+  private readonly Lock _dataLock = new();
   private readonly List<DataShellResponse> _data = new();
 
   public bool Completed => _completion is not null;

@@ -1,0 +1,101 @@
+name: Publish StarBridger
+
+on:
+  workflow_dispatch:
+    inputs:
+      feed:
+        description: Release channel
+        required: true
+        type: choice
+        default: Tester
+        options:
+          - Tester
+          - Release
+
+permissions:
+  contents: read
+
+concurrency:
+  group: starbridger-release
+  cancel-in-progress: false
+
+jobs:
+  package:
+    runs-on: windows-2025
+    permissions:
+      contents: read
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          submodules: recursive
+
+      - uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: |
+            8.0.x
+            10.0.x
+
+      - name: Test
+        run: dotnet test StarBridger.slnx --configuration Release
+
+      - name: Assemble ZIP and MSI
+        shell: pwsh
+        run: |
+          dotnet msbuild StarBridger.Packaging.proj -target:PackageAll -property:Configuration=Release -property:RuntimeIdentifier=win-x64 -property:ProductVersion=1.0.${{ github.run_number }}
+          if ($LASTEXITCODE -ne 0) { throw 'Packaging failed' }
+
+      - name: Check release assets and generate checksums
+        shell: pwsh
+        run: |
+          $assets = @('artifacts/StarBridger-win-x64.zip', 'artifacts/StarBridger-win-x64.msi')
+          foreach ($asset in $assets) {
+            if (-not (Test-Path $asset)) { throw "Missing artifact: $asset" }
+          }
+          $checksums = foreach ($asset in $assets) {
+            $hash = (Get-FileHash $asset -Algorithm SHA256).Hash.ToLowerInvariant()
+            "$hash  $(Split-Path $asset -Leaf)"
+          }
+          $checksums | Set-Content artifacts/SHA256SUMS.txt -Encoding ascii
+
+      - uses: actions/upload-artifact@v4
+        with:
+          name: starbridger-release-assets
+          if-no-files-found: error
+          path: |
+            artifacts/StarBridger-win-x64.zip
+            artifacts/StarBridger-win-x64.msi
+            artifacts/SHA256SUMS.txt
+
+  release:
+    runs-on: ubuntu-24.04
+    needs: package
+    permissions:
+      contents: write
+    steps:
+      - uses: actions/download-artifact@v4
+        with:
+          name: starbridger-release-assets
+          path: ./release-assets
+
+      - name: Generate tag
+        id: tag
+        shell: bash
+        env:
+          FEED: ${{ inputs.feed }}
+        run: |
+          tag="v$(date -u +'%Y.%m.%d').${GITHUB_RUN_NUMBER}"
+          if [[ "$FEED" == 'Tester' ]]; then tag="$tag-tester"; fi
+          echo "tag=$tag" >> "$GITHUB_OUTPUT"
+
+      - uses: softprops/action-gh-release@v2
+        with:
+          tag_name: ${{ steps.tag.outputs.tag }}
+          target_commitish: ${{ github.sha }}
+          name: ${{ steps.tag.outputs.tag }}
+          prerelease: ${{ inputs.feed == 'Tester' }}
+          generate_release_notes: true
+          fail_on_unmatched_files: true
+          files: |
+            release-assets/StarBridger-win-x64.zip
+            release-assets/StarBridger-win-x64.msi
+            release-assets/SHA256SUMS.txt

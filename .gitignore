@@ -182,6 +182,7 @@ DocProject/Help/html
 
 # Click-Once directory
 publish/
+Publish-Scripts/Installer/obj
 
 # Publish Web Output
 *.[Pp]ublish.xml

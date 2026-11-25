@@ -6,14 +6,9 @@ using System.Text;
 
 namespace StarBridger.Telemetry.Versionning;
 
-public class ContractDowngrader
+public class ContractDowngrader(Version targetVersion)
 {
-  private readonly Version _targetVersion;
-
-  public ContractDowngrader(Version targetVersion)
-  {
-    _targetVersion = targetVersion.Normalize();
-  }
+  private readonly Version _targetVersion = targetVersion.Normalize();
 
   public static VersionnableContract Downgrade(object contract, Version targetVersion)
   {

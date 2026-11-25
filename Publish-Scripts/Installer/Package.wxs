@@ -1,0 +1,82 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Wix xmlns="http://wixtoolset.org/schemas/v4/wxs"
+     xmlns:ui="http://wixtoolset.org/schemas/v4/wxs/ui">
+	<Package Name="StarBridger"
+           Manufacturer="StarBridger"
+           Version="$(var.ProductVersion)"
+           UpgradeCode="{2A1B050F-198A-4A05-A06E-40D093B6D2B0}"
+           Scope="perUser"
+           Language="1033">
+
+		<MajorUpgrade DowngradeErrorMessage="A newer StarBridger version is already installed." />
+		<MediaTemplate EmbedCab="yes" />
+
+		<!-- No admin installation. All application files are under the user's profile. -->
+		<StandardDirectory Id="LocalAppDataFolder">
+			<Directory Id="LocalPrograms" Name="Programs">
+				<Directory Id="INSTALLFOLDER" Name="StarBridger" />
+			</Directory>
+		</StandardDirectory>
+		<StandardDirectory Id="ProgramMenuFolder" />
+		<StandardDirectory Id="DesktopFolder" />
+
+		<!-- Traditional Windows Installer wizard: native feature chooser, no custom skin. -->
+		<ui:WixUI Id="WixUI_FeatureTree" />
+		<WixVariable Id="WixUILicenseRtf" Value="$(sys.SOURCEFILEDIR)InstallerNotice.rtf" />
+		<WixVariable Id="WixUIDialogBmp" Value="Assets\InstallerDialog.png" />
+		<WixVariable Id="WixUIBannerBmp" Value="Assets\InstallerBanner.png" />
+		<UIRef Id="WixUI_ErrorProgressText" />
+
+		<Feature Id="StarBridgerApp"
+             Title="StarBridger"
+             Description="StarBridger UI, Host and Shell"
+             Level="1" AllowAbsent="no" Display="expand"
+             ConfigurableDirectory="INSTALLFOLDER">
+			<ComponentGroupRef Id="PublishedFiles" />
+			<ComponentRef Id="LocalProgramsCleanupComponent" />
+
+			<!-- Level 2 means opt-in: neither shortcut is installed by default. -->
+			<Feature Id="StartMenuShortcutFeature"
+							 Title="Start Menu shortcut (recommended)"
+							 Description="Add StarBridger to the Windows Start Menu"
+							 Level="1"
+							 AllowAbsent="yes"
+							 AllowAdvertise="no">
+				<ComponentRef Id="StartMenuShortcutComponent" />
+			</Feature>
+			<Feature Id="DesktopShortcutFeature" Title="Desktop shortcut"
+               Description="Create a StarBridger UI shortcut on the desktop"
+               Level="2" AllowAdvertise="no">
+				<ComponentRef Id="DesktopShortcutComponent" />
+			</Feature>
+		</Feature>
+
+		<!-- These registry key paths are Windows Installer bookkeeping, removed on uninstall. -->
+		<Component Id="StartMenuShortcutComponent" Directory="INSTALLFOLDER" Guid="{95E79078-F667-4F14-BB93-24EDC5829A31}">
+			<Shortcut Id="StartMenuShortcut" Name="StarBridger"
+                Directory="ProgramMenuFolder" Advertise="no"
+                Target="[INSTALLFOLDER]StarBridger.UI.exe" WorkingDirectory="INSTALLFOLDER" />
+			<RegistryValue Root="HKCU" Key="Software\StarBridger\Installer\Shortcuts"
+                     Name="StartMenu" Type="integer" Value="1" KeyPath="yes" />
+		</Component>
+		<Component Id="DesktopShortcutComponent" Directory="INSTALLFOLDER" Guid="{92A93CEB-6ED7-4E2D-B2B4-A28AFBCE84BB}">
+			<Shortcut Id="DesktopShortcut" Name="StarBridger"
+                Directory="DesktopFolder" Advertise="no"
+                Target="[INSTALLFOLDER]StarBridger.UI.exe" WorkingDirectory="INSTALLFOLDER" />
+			<RegistryValue Root="HKCU" Key="Software\StarBridger\Installer\Shortcuts"
+                     Name="Desktop" Type="integer" Value="1" KeyPath="yes" />
+		</Component>
+		<!-- Required MSI bookkeeping: safely remove our parent LocalAppData\Programs folder
+         only if it is empty after uninstall. Never delete another app's files. -->
+		<Component Id="LocalProgramsCleanupComponent" Directory="LocalPrograms" Guid="{7E511253-4BAD-4AAC-9F19-9B747B6B0025}">
+			<RemoveFolder Id="RemoveEmptyLocalPrograms" Directory="LocalPrograms" On="uninstall" />
+			<RegistryValue Root="HKCU" Key="Software\StarBridger\Installer\Cleanup"
+                     Name="LocalPrograms" Type="integer" Value="1" KeyPath="yes" />
+		</Component>
+		<Icon Id="StarBridger.ico"
+      SourceFile="Assets\icon.ico" />
+
+		<Property Id="ARPPRODUCTICON"
+							Value="StarBridger.ico" />
+	</Package>
+</Wix>

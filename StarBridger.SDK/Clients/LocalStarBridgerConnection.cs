@@ -89,14 +89,14 @@ internal class LocalStarBridgerConnection : IStarBridgerConnection
 
   public async ValueTask DisposeAsync()
   {
-    await DisconnectAsync();
-
+    if (IsConnected)
+      await DisconnectAsync();
   }
 
   public async IAsyncEnumerable<ShellResponse> ExecuteShellAsync(Command command, [EnumeratorCancellation] CancellationToken cancellationToken = default)
   {
     using NamedPipeClientStream pipe = new(".", PipeNames.Shell, PipeDirection.InOut, PipeOptions.Asynchronous);
-    await pipe.ConnectAsync(3000);
+    await pipe.ConnectAsync(3000, cancellationToken);
 
     using StreamReader reader = new(pipe, Encoding.UTF8, false, 1024, leaveOpen: true);
 

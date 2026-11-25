@@ -1,0 +1,62 @@
+<Project DefaultTargets="PackageAll">
+  <!-- Put at repository root. No ProjectReference between the three executables. -->
+  <PropertyGroup>
+    <Configuration Condition="'$(Configuration)' == ''">Release</Configuration>
+    <RuntimeIdentifier Condition="'$(RuntimeIdentifier)' == ''">win-x64</RuntimeIdentifier>
+    <ProductVersion Condition="'$(ProductVersion)' == ''">1.0.0</ProductVersion>
+    <RepoRoot>$(MSBuildThisFileDirectory)</RepoRoot>
+    <ArtifactsRoot>$(RepoRoot)artifacts/</ArtifactsRoot>
+    <StagingRoot>$(ArtifactsRoot)staging/$(RuntimeIdentifier)/</StagingRoot>
+    <PackageRoot>$(ArtifactsRoot)package/$(RuntimeIdentifier)/</PackageRoot>
+    <ArchivePath>$(ArtifactsRoot)StarBridger-$(RuntimeIdentifier).zip</ArchivePath>
+    <MsiPath>$(ArtifactsRoot)StarBridger-$(RuntimeIdentifier).msi</MsiPath>
+    <InstallerDir>$(RepoRoot)Publish-Scripts/Installer/</InstallerDir>
+    <UiProject>$(RepoRoot)StarBridger.UI/StarBridger.UI.csproj</UiProject>
+    <HostProject>$(RepoRoot)StarBridger.Host/StarBridger.Host.csproj</HostProject>
+    <ShellProject>$(RepoRoot)StarBridger.Shell/StarBridger.Shell.csproj</ShellProject>
+  </PropertyGroup>
+
+  <Target Name="Prepare">
+    <Error Condition="'$(RuntimeIdentifier)' != 'win-x64'" Text="Installer is currently implemented only for win-x64." />
+    <Error Condition="!Exists('$(UiProject)')" Text="Missing UI: $(UiProject)" />
+    <Error Condition="!Exists('$(HostProject)')" Text="Missing Host: $(HostProject)" />
+    <Error Condition="!Exists('$(ShellProject)')" Text="Missing Shell: $(ShellProject)" />
+    <RemoveDir Directories="$(StagingRoot);$(PackageRoot)" />
+    <MakeDir Directories="$(StagingRoot)ui;$(StagingRoot)host;$(StagingRoot)shell;$(PackageRoot)" />
+  </Target>
+
+  <Target Name="PublishApplications" DependsOnTargets="Prepare">
+    <Exec Command="dotnet publish &quot;$(UiProject)&quot; -c $(Configuration) -r $(RuntimeIdentifier) --self-contained true -p:PublishSingleFile=true -p:IncludeNativeLibrariesForSelfExtract=true -p:PublishTrimmed=false -o &quot;$(StagingRoot)ui&quot;" />
+    <Exec Command="dotnet publish &quot;$(HostProject)&quot; -c $(Configuration) -r $(RuntimeIdentifier) --self-contained true -p:PublishSingleFile=true -p:IncludeNativeLibrariesForSelfExtract=true -p:PublishTrimmed=false -o &quot;$(StagingRoot)host&quot;" />
+    <Exec Command="dotnet publish &quot;$(ShellProject)&quot; -c $(Configuration) -r $(RuntimeIdentifier) --self-contained true -p:PublishSingleFile=true -p:IncludeNativeLibrariesForSelfExtract=true -p:PublishTrimmed=false -o &quot;$(StagingRoot)shell&quot;" />
+  </Target>
+
+  <Target Name="Assemble" DependsOnTargets="PublishApplications">
+    <ItemGroup>
+      <!-- PDBs are not required for the consumer distribution. -->
+      <_UiFiles Include="$(StagingRoot)ui/**/*" Exclude="$(StagingRoot)ui/**/*.pdb" />
+      <_HostFiles Include="$(StagingRoot)host/**/*" Exclude="$(StagingRoot)host/**/*.pdb" />
+      <_ShellFiles Include="$(StagingRoot)shell/**/*" Exclude="$(StagingRoot)shell/**/*.pdb" />
+    </ItemGroup>
+    <Copy SourceFiles="@(_UiFiles)" DestinationFiles="@(_UiFiles->'$(PackageRoot)%(RecursiveDir)%(Filename)%(Extension)')" />
+    <Copy SourceFiles="@(_HostFiles)" DestinationFiles="@(_HostFiles->'$(PackageRoot)%(RecursiveDir)%(Filename)%(Extension)')" />
+    <Copy SourceFiles="@(_ShellFiles)" DestinationFiles="@(_ShellFiles->'$(PackageRoot)%(RecursiveDir)%(Filename)%(Extension)')" />
+    <Error Condition="!Exists('$(PackageRoot)StarBridger.UI.exe')" Text="Expected StarBridger.UI.exe in package" />
+    <Error Condition="!Exists('$(PackageRoot)StarBridger.Host.exe')" Text="Expected StarBridger.Host.exe in package" />
+    <Error Condition="!Exists('$(PackageRoot)StarBridger.Shell.exe')" Text="Expected StarBridger.Shell.exe in package (check AssemblyName)." />
+  </Target>
+
+  <Target Name="Package" DependsOnTargets="Assemble">
+    <ZipDirectory SourceDirectory="$(PackageRoot)" DestinationFile="$(ArchivePath)" Overwrite="true" />
+    <Message Importance="high" Text="Portable package: $(ArchivePath)" />
+  </Target>
+
+  <Target Name="Msi" DependsOnTargets="Assemble">
+    <Exec Command="pwsh -NoProfile -File &quot;$(InstallerDir)Generate-WixComponents.ps1&quot; -PayloadRoot &quot;$(PackageRoot)&quot; -OutputPath &quot;$(InstallerDir)obj/GeneratedFiles.wxs&quot;" />
+    <Exec Command="dotnet build &quot;$(InstallerDir)StarBridger.Installer.wixproj&quot; -c Release -p:ProductVersion=$(ProductVersion) -p:OutputPath=&quot;$(ArtifactsRoot)&quot;" />
+    <Error Condition="!Exists('$(MsiPath)')" Text="WiX did not create the expected MSI: $(MsiPath)" />
+    <Message Importance="high" Text="MSI: $(MsiPath)" />
+  </Target>
+
+  <Target Name="PackageAll" DependsOnTargets="Package;Msi" />
+</Project>

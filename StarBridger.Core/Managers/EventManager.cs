@@ -12,7 +12,7 @@ public class EventManager<TEvent> where TEvent : class
 {
   private const int DEFAULT_QUEUE_CAPACITY = 128;
 
-  private readonly object _sync = new();
+  private readonly Lock _sync = new();
   private readonly Dictionary<Guid, Subscription<TEvent>> _subscribers = new();
   private readonly Dictionary<Guid, HashSet<Guid>> _owners = new();
   private readonly ILogger _logger;
@@ -123,7 +123,7 @@ public class EventManager<TEvent> where TEvent : class
     foreach (Subscription<TEvent> subscription in subscriptions)
       subscription.Stop();
 
-    return subscriptions.Select(subscription => subscription.Worker).ToArray();
+    return [.. subscriptions.Select(subscription => subscription.Worker)];
   }
 
   #endregion
@@ -140,7 +140,7 @@ public class EventManager<TEvent> where TEvent : class
       if (_stopping)
         return 0;
 
-      subscriptions = _subscribers.Values.ToArray();
+      subscriptions = [.. _subscribers.Values];
       eventData = PreparePublication(eventData);
     }
 
@@ -181,7 +181,7 @@ public class EventManager<TEvent> where TEvent : class
         return _stopTask;
 
       _stopping = true;
-      Subscription<TEvent>[] subscriptions = _subscribers.Values.ToArray();
+      Subscription<TEvent>[] subscriptions = [.. _subscribers.Values];
       _subscribers.Clear();
       _owners.Clear();
 

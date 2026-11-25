@@ -23,7 +23,7 @@ internal static class ShellReceiver
           Service = nameof(Host),
           Name = "Status",
           Description = "Get the current status of StarBridger",
-          Arguments = Array.Empty<ArgumentDefinition>()
+          Arguments = []
         },
         GetStatus),
       (new CommandDefinition
@@ -31,8 +31,8 @@ internal static class ShellReceiver
           Service = nameof(Host),
           Name = "Shutdown",
           Description = "Shutdown StarBridger",
-          Arguments = Array.Empty<ArgumentDefinition>()
-        }, async (_, output, data, cancellationToken) => Shutdown(output, cancellationToken, lifetime)),
+          Arguments = []
+        }, async (_, output, data, cancellationToken) => Shutdown(output, lifetime, cancellationToken)),
       (new CommandDefinition
         {
           Service = nameof(Host),
@@ -40,7 +40,7 @@ internal static class ShellReceiver
           Description = "Lists all available commands and their arguments."
         },
         (command, output, data, cancellationToken) =>
-          GetHelp(command, output, data, cancellationToken, shell)),
+          GetHelp(command, output, data, shell, cancellationToken)),
     };
 
     foreach ((CommandDefinition definition, StarBridgerShell.CommandHandler handler) in commands)
@@ -49,7 +49,7 @@ internal static class ShellReceiver
     }
   }
 
-  private static Task GetHelp(Command command, Action<string>? output, Action<object>? data, CancellationToken cancellationToken, StarBridgerShell shell)
+  private static Task GetHelp(Command command, Action<string>? output, Action<object>? data, StarBridgerShell shell, CancellationToken cancellationToken)
   {
     cancellationToken.ThrowIfCancellationRequested();
 
@@ -88,7 +88,7 @@ internal static class ShellReceiver
     return Task.CompletedTask;
   }
 
-  private static Task Shutdown(Action<string>? output, CancellationToken cancellationToken, IHostApplicationLifetime lifetime)
+  private static Task Shutdown(Action<string>? output, IHostApplicationLifetime lifetime, CancellationToken cancellationToken)
   {
     cancellationToken.ThrowIfCancellationRequested();
 

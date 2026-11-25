@@ -27,13 +27,13 @@ public sealed class StarCitizenTelemetryService : BackgroundService
 
   private readonly ILogger<StarCitizenTelemetryService> _logger;
   private readonly StarBridgerShell _shell;
-  private readonly object _extractLock = new();
+  private readonly Lock _extractLock = new();
   private VehicleFrame? _lastVehicleFrame;
   private ActorFrame? _lastActorFrame;
   private WeaponsFrame? _lastWeaponsFrame;
   private DateTimeOffset? _lastTelemetryAtUtc;
 
-  private readonly object _reconnectLock = new();
+  private readonly Lock _reconnectLock = new();
   private CancellationTokenSource? _activeAttempt;
 
   private DateTimeOffset? _lastConnectedAtUtc;

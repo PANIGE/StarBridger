@@ -7,7 +7,7 @@ using System.IO.Pipes;
 using System.Text;
 using System.Threading.Channels;
 
-internal sealed class IpcSession
+internal sealed class IpcSession(NamedPipeServerStream pipe, CancellationToken stoppingToken)
 {
   private readonly Channel<Packet> _outgoing = Channel.CreateBounded<Packet>(
       new BoundedChannelOptions(128)
@@ -23,19 +23,13 @@ internal sealed class IpcSession
 
   public Intents Intents { get; set; } = Intents.All;
 
-  public NamedPipeServerStream Pipe { get; }
+  public NamedPipeServerStream Pipe { get; } = pipe;
 
-  public CancellationToken StoppingToken { get; }
+  public CancellationToken StoppingToken { get; } = stoppingToken;
 
   public bool Available =>
     Pipe.IsConnected &&
     !StoppingToken.IsCancellationRequested;
-
-  public IpcSession(NamedPipeServerStream pipe, CancellationToken stoppingToken)
-  {
-    Pipe = pipe;
-    StoppingToken = stoppingToken;
-  }
 
   public bool Send(object? payload, Intents type, bool force = false)
   {

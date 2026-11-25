@@ -5,7 +5,20 @@
     <TargetFramework>net11.0</TargetFramework>
     <ImplicitUsings>enable</ImplicitUsings>
     <Nullable>enable</Nullable>
+    <ApplicationIcon>ressources\icon.ico</ApplicationIcon>
   </PropertyGroup>
+
+  <ItemGroup>
+    <None Remove="ressources\icon.ico" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Content Include="ressources\icon.ico" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <EmbeddedResource Include="ressources\icon.ico" />
+  </ItemGroup>
 
   <ItemGroup>
     <ProjectReference Include="..\StarBridger.SDK\StarBridger.SDK.csproj" />

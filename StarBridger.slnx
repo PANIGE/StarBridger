@@ -8,12 +8,27 @@
   <Folder Name="/Infrastructure/">
     <Project Path="StarBridger.IPC/StarBridger.IPC.csproj" />
     <Project Path="StarBridger.Telemetry/StarBridger.Telemetry.csproj" />
-    <Project Path="StarBridger.Web/StarBridger.WEB.csproj" DisplayName="StarBridger.Web" />
+    <Project Path="StarBridger.Web/StarBridger.WEB.csproj" />
   </Folder>
 
   <Folder Name="/Applications/">
     <Project Path="StarBridger.Host/StarBridger.Host.csproj" Id="8ccc5d05-5180-4a01-87d7-77d97a33ff05" />
     <Project Path="StarBridger.UI/StarBridger.UI.csproj" />
+  </Folder>
+  <Folder Name="/Publish-Scripts/">
+    <File Path="StarBridger.Packaging.proj" />
+  </Folder>
+  <Folder Name="/Publish-Scripts/.github/" />
+  <Folder Name="/Publish-Scripts/.github/workflows/">
+    <File Path=".github/workflows/build.yml" />
+    <File Path=".github/workflows/linter.yml" />
+    <File Path=".github/workflows/publish.yml" />
+  </Folder>
+  <Folder Name="/Publish-Scripts/Installer/">
+    <File Path="Publish-Scripts/Installer/Generate-WixComponents.ps1" />
+    <File Path="Publish-Scripts/Installer/InstallerNotice.rtf" />
+    <File Path="Publish-Scripts/Installer/Package.wxs" />
+    <File Path="Publish-Scripts/Installer/StarBridger.Installer.wixproj" />
   </Folder>
 
   <Folder Name="/SDK/">

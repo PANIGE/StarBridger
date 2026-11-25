@@ -155,13 +155,13 @@ public sealed class TelemetryContext
     }
   }
 
-  private T? DeserializeTelemetry<T>(JToken token) where T : class
+  private static T? DeserializeTelemetry<T>(JToken token) where T : class
   {
     try
     {
       return token.ToObject<T>();
     }
-    catch (JsonException ex)
+    catch (JsonException)
     {
       // incompatible or invalid telemetry payload.
       return null;

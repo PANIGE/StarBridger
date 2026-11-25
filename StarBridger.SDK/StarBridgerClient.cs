@@ -4,6 +4,7 @@ using StarBridger.Contracts.Enums;
 using StarBridger.SDK.Clients;
 using StarBridger.SDK.Controllers;
 using StarBridger.SDK.Controllers.Shell;
+using StarBridger.SDK.Enums;
 using StarBridger.SDK.Exceptions;
 using System.Security.Principal;
 

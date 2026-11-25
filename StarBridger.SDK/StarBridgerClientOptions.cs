@@ -1,5 +1,6 @@
 ﻿
 using StarBridger.Contracts.Enums;
+using StarBridger.SDK.Enums;
 
 namespace StarBridger.SDK;
 

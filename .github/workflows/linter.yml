@@ -1,0 +1,33 @@
+name: Formatting
+
+on:
+  pull_request:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  formatting:
+    name: Verify .editorconfig
+    runs-on: windows-2025
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      # .slnx needs an SDK version supporting the new solution format.
+      # .NET 8 is also installed for projects and tests targeting net8.0.
+      - name: Setup .NET
+        uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: |
+            10.0.x
+            8.0.x
+
+      - name: Restore
+        run: dotnet restore StarBridger.slnx
+
+      # Don't commit to contributors' branches or silently rewrite PRs.
+      - name: Verify formatting
+        run: dotnet format StarBridger.slnx --verify-no-changes --no-restore --verbosity minimal

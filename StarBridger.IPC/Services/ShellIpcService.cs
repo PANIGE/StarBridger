@@ -14,18 +14,12 @@ using System.Threading.Channels;
 
 namespace StarBridger.IPC.Services;
 
-public sealed class ShellIpcService : BackgroundService
+public sealed class ShellIpcService(StarBridgerShell shell, ILogger<ShellIpcService> logger) : BackgroundService
 {
   private const int QUEUE_CAPACITY = 128;
 
-  private readonly StarBridgerShell _shell;
-  private readonly ILogger<ShellIpcService> _logger;
-
-  public ShellIpcService(StarBridgerShell shell, ILogger<ShellIpcService> logger)
-  {
-    _shell = shell;
-    _logger = logger;
-  }
+  private readonly StarBridgerShell _shell = shell;
+  private readonly ILogger<ShellIpcService> _logger = logger;
 
   protected override async Task ExecuteAsync(CancellationToken stoppingToken)
   {
