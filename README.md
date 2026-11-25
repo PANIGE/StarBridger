@@ -1,7 +1,5 @@
 [![Build](https://github.com/PANIGE/StarBridger/actions/workflows/build.yml/badge.svg?branch=main)](https://github.com/OWNER/StarBridger/actions/workflows/build.yml)
-
 [![Linter](https://github.com/PANIGE/StarBridger/actions/workflows/linter.yml/badge.svg)](https://github.com/OWNER/StarBridger/actions/workflows/linter.yml)
-
 ![License](https://img.shields.io/badge/license-MIT-blue)
 
 # StarBridger
